@@ -20,10 +20,9 @@ import { Sidebar } from "./components/sidebar";
 import PaymentInfo from "./pages/payment-info";
 import AddAdmin from "./pages/add-admin";
 import ManageAdmins from "./pages/manage-admins";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <AuthProvider>
@@ -35,15 +34,46 @@ function App() {
               <main className="p-4 flex-1">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/creator-form" element={<CreatorForm setUser={setUser} />} />
-                  <Route path="/business-card/:id" element={<BusinessCard />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/myqrs" element={<MyQRs />} />
-                  <Route path="/payment-info" element={<PaymentInfo />} />
-                  <Route path="/add-admin" element={<AddAdmin />} />
-                  <Route path="/manage-admins" element={<ManageAdmins />} />
+                  
+                  <Route path="/creator-form" element={
+                    <ProtectedRoute>
+                      <CreatorForm />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/business-card/:id" element={<BusinessCard />} />
+                  
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/myqrs" element={
+                    <ProtectedRoute>
+                      <MyQRs />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/payment-info" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <PaymentInfo />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/add-admin" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AddAdmin />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/manage-admins" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <ManageAdmins />
+                    </ProtectedRoute>
+                  } />
                 </Routes>
               </main>
             </div>
