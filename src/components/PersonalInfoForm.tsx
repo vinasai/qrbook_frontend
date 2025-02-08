@@ -12,7 +12,7 @@ export default function PersonalInfoForm({
   return (
     <div className="space-y-4">
       <div>
-        <Label className="font-geo text-2xl" htmlFor="name">Full Name</Label>
+        <Label className="font-russo text-md" htmlFor="name">Full Name</Label>
         <div className="relative">
           <FontAwesomeIcon
             icon={faUser}
@@ -32,7 +32,7 @@ export default function PersonalInfoForm({
         )}
       </div>
       <div>
-        <Label className="font-geo text-2xl" htmlFor="pronouns">Pronouns</Label>
+        <Label className="font-russo text-md" htmlFor="pronouns">Pronouns</Label>
         <div className="relative">
           <FontAwesomeIcon
             icon={faAt}
@@ -52,7 +52,7 @@ export default function PersonalInfoForm({
         )}
       </div>
       <div>
-        <Label className="font-geo text-2xl" htmlFor="jobPosition">Job Position</Label>
+        <Label className="font-russo text-md" htmlFor="jobPosition">Job Position</Label>
         <div className="relative">
           <FontAwesomeIcon
             icon={faBriefcase}
@@ -72,7 +72,7 @@ export default function PersonalInfoForm({
         )}
       </div>
       <div>
-        <Label className="font-geo text-2xl" htmlFor="profileImage">Profile Image</Label>
+        <Label className="font-russo text-md" htmlFor="profileImage">Profile Image</Label>
         <div className="flex items-center space-x-4">
           {formData.profileImage && (
             <img

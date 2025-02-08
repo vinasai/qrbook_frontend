@@ -99,9 +99,9 @@ export default function AnimatedRegisterForm() {
             >
               <Icons.logo className="h-8 w-8" />
             </motion.div>
-            <CardTitle className="text-3xl font-bold font-geo">Register</CardTitle>
+            <CardTitle className="text-2xl font-bold font-russo">Register</CardTitle>
           </div>
-          <CardDescription className="font-geo text-xl">
+          <CardDescription className="font-russo text-lg">
             Create your account in just a few steps
           </CardDescription>
         </CardHeader>
@@ -116,7 +116,7 @@ export default function AnimatedRegisterForm() {
               {step === 1 && (
                 <>
                   <div className="relative">
-                    <Label className="font-geo text-2xl" htmlFor="fullName">Full Name</Label>
+                    <Label className="font-russo text-xl" htmlFor="fullName">Full Name</Label>
                     <div className="relative">
                       <Input
                         id="fullName"
@@ -130,7 +130,7 @@ export default function AnimatedRegisterForm() {
                     </div>
                   </div>
                   <div className="relative">
-                    <Label className="font-geo text-2xl" htmlFor="email">Email</Label>
+                    <Label className="font-russo text-xl" htmlFor="email">Email</Label>
                     <div className="relative">
                       <Input
                         id="email"
@@ -154,7 +154,7 @@ export default function AnimatedRegisterForm() {
                   className="space-y-4"
                 >
                   <div className="relative">
-                    <Label className="font-geo text-2xl" htmlFor="password">Password</Label>
+                    <Label className="font-russo text-xl" htmlFor="password">Password</Label>
                     <div className="relative">
                       <Input
                         id="password"
@@ -168,7 +168,7 @@ export default function AnimatedRegisterForm() {
                     </div>
                   </div>
                   <div className="relative">
-                    <Label className="font-geo text-2xl" htmlFor="confirmPassword">Confirm Password</Label>
+                    <Label className="font-russo text-xl" htmlFor="confirmPassword">Confirm Password</Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
@@ -185,7 +185,7 @@ export default function AnimatedRegisterForm() {
               )}
             </motion.div>
 
-            <Button className="w-full font-geo text-2xl" type="submit" disabled={isLoading}>
+            <Button className="w-full font-russo text-xl" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -209,9 +209,9 @@ export default function AnimatedRegisterForm() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <p className="text-lg font-geo text-muted-foreground">
+            <p className="text-md font-russo text-muted-foreground">
               Already have an account?{" "}
-              <Button  onClick={() => navigate("/login")} variant="link" className="text-primary text-lg font-geo">
+              <Button  onClick={() => navigate("/login")} variant="link" className="text-primary text-md font-russo">
                               Sign In
                               </Button>
             </p>

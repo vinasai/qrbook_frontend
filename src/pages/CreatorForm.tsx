@@ -208,10 +208,10 @@ export default function CreatorForm() {
     <div className="min-h-screen  p-8 mt-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-3xl font-geo text-center">
+          <CardTitle className="text-xl font-russo text-center">
             Create Your Digital Business Card
           </CardTitle>
-          <CardDescription className="text-center font-geo text-xl">
+          <CardDescription className="text-center font-russo text-lg">
             Generate a beautiful, shareable digital business card with QR code
             in minutes
           </CardDescription>

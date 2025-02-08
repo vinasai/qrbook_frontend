@@ -35,45 +35,29 @@ export function LoginForm({
     setError(null);
     setIsLoading(true);
 
-    const payload = {
-      email,
-      password,
-    };
-
     try {
       const response = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        credentials: "include", // Include cookies in the request
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server Response:", errorData);
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
       const data = await response.json();
-      console.log("Login successful", data);
-
-      // Call the login function from AuthContext
-      login(data.token, data.user.fullName, data.user.userId);
-
-      // Redirect based on user type
-      if (data.user.type === "admin") {
-        navigate("/payment-info");
-      } else {
-        navigate("/");
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
       }
+
+      login(
+        data.token,
+        data.user.fullName,
+        data.user.userId,
+        data.user.type
+      );
+
+      navigate(data.user.type === "admin" ? "/payment-info" : "/");
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("An unknown error occurred");
-      }
+      setError(error instanceof Error ? error.message : "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +65,7 @@ export function LoginForm({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md ">
         <CardHeader>
           <div className="flex items-center space-x-2">
             <motion.div
@@ -91,9 +75,9 @@ export function LoginForm({
             >
               <Icons.logo className="h-8 w-8" />
             </motion.div>
-            <CardTitle className="text-3xl font-bold font-geo">Login</CardTitle>
+            <CardTitle className="text-xl font-bold font-russo">Login</CardTitle>
           </div>
-          <CardDescription className="font-geo text-xl">
+          <CardDescription className="font-russo text-lg">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
@@ -110,7 +94,7 @@ export function LoginForm({
               className="space-y-4"
             >
               <div className="relative">
-                <Label className="font-geo text-2xl" htmlFor="email">Email</Label>
+                <Label className="font-russo text-xl" htmlFor="email">Email</Label>
                 <div className="relative">
                   <Input
                     id="email"
@@ -125,7 +109,7 @@ export function LoginForm({
                 </div>
               </div>
               <div className="relative">
-                <Label className="font-geo text-2xl" htmlFor="password">Password</Label>
+                <Label className="font-russo text-xl" htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -150,7 +134,7 @@ export function LoginForm({
                 </div>
                 <a
                   href="#"
-                  className="ml-auto text-lg font-geo underline-offset-4 hover:underline block text-right mt-2"
+                  className="ml-auto text-md font-russo underline-offset-4 hover:underline block text-right mt-2"
                 >
                   Forgot your password?
                 </a>
@@ -159,7 +143,7 @@ export function LoginForm({
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
-            <Button className="w-full font-geo text-2xl" type="submit" disabled={isLoading}>
+            <Button className="w-full font-russo text-2xl" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -174,9 +158,9 @@ export function LoginForm({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <p className="text-lg font-geo text-muted-foreground">
+            <p className="text-md font-russo text-muted-foreground">
               Don&apos;t have an account?{" "}
-                <Button  onClick={() => navigate("/register")} variant="link" className="text-primary text-lg font-geo">
+                <Button  onClick={() => navigate("/register")} variant="link" className="text-primary text-md font-russo">
                 Sign up
                 </Button>
             </p>
