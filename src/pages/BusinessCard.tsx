@@ -16,17 +16,27 @@ const BusinessCardContent = () => {
   const [personalInfo, setPersonalInfo] = useState(null)
 
   useEffect(() => {
-    const fetchCardData = async () => {
+  const fetchCardData = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/cards/encoded/${id}`
+      );
+      setPersonalInfo(response.data);
+    } catch (error) {
+      // Fallback to original ID endpoint
       try {
-        const response = await axios.get(`http://localhost:5000/api/cards/${id}`)
-        setPersonalInfo(response.data)
-      } catch (error) {
-        console.error("Error fetching card data:", error.response?.data || error.message)
+        const fallbackResponse = await axios.get(
+          `http://localhost:5000/api/cards/${id}`
+        );
+        setPersonalInfo(fallbackResponse.data);
+      } catch (fallbackError) {
+        console.error("Both endpoints failed:", fallbackError);
       }
     }
+  };
 
-    fetchCardData()
-  }, [id])
+  fetchCardData();
+}, [id]);
 
   if (!personalInfo) {
     return (

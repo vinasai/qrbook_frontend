@@ -43,7 +43,7 @@ function App() {
                     </ProtectedRoute>
                   } />
                   
-                  <Route path="/business-card/:id" element={<BusinessCard />} />
+                  <Route path="/:id" element={<BusinessCard />} />
                   
                   <Route path="/profile" element={
                     <ProtectedRoute>
@@ -86,12 +86,23 @@ function App() {
 
 function ConditionalNavbar() {
   const location = useLocation();
-  return location.pathname.startsWith("/business-card") ||
+
+  // Exclude specific routes
+  if (
+    location.pathname.startsWith("/business-card") ||
     location.pathname.startsWith("/payment-info") ||
     location.pathname.startsWith("/add-admin") ||
     location.pathname.startsWith("/manage-admins")
-    ? null
-    : <Navbar />;
+  ) {
+    return null;
+  }
+
+  // Exclude single-segment routes except for "/myqrs"
+  if (/^\/[^/]+$/.test(location.pathname) && location.pathname !== "/myqrs") {
+    return null;
+  }
+
+  return <Navbar />;
 }
 
 function ConditionalSidebar() {
@@ -102,7 +113,8 @@ function ConditionalSidebar() {
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/register") ||
     location.pathname.startsWith("/profile") ||
-    location.pathname.startsWith("/myqrs")
+    location.pathname.startsWith("/myqrs") ||
+    /^\/[^/]+$/.test(location.pathname) // Exclude paths with a single segment (e.g., /:id)
     ? null
     : <Sidebar />;
 }
