@@ -139,7 +139,7 @@ export default function RegistrationForm({
         Already have an account?{" "}
         <a
           href="/login"
-          className="underline underline-offset-4 hover:text-primary"
+          className="underline underline-offset-4 hover:text-primary font-bold"
         >
           Login
         </a>

@@ -27,7 +27,7 @@ export default function SocialMediaForm({
           </Button>
         </div>
       ))}
-      <Button type="button" variant="outline" onClick={addSocialMediaLink} className="w-full font-russo text-lg">
+      <Button type="button" variant="outline" onClick={addSocialMediaLink} className="w-full font-sans text-lg">
         <FontAwesomeIcon icon={faPlus} className="mr-2 " />
         Add Social Media Link
       </Button>

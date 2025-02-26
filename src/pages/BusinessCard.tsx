@@ -19,14 +19,14 @@ const BusinessCardContent = () => {
   const fetchCardData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/cards/encoded/${id}`
+        `https://qrbook.ca:5002/api/cards/encoded/${id}`
       );
       setPersonalInfo(response.data);
     } catch (error) {
       // Fallback to original ID endpoint
       try {
         const fallbackResponse = await axios.get(
-          `http://localhost:5000/api/cards/${id}`
+          `https://qrbook.ca:5002/api/cards/${id}`
         );
         setPersonalInfo(fallbackResponse.data);
       } catch (fallbackError) {
@@ -113,7 +113,7 @@ END:VCARD`.replace(/\n/g, "\r\n")
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <img
-              src={`http://localhost:5000${personalInfo.profileImage}`}
+              src={`https://qrbook.ca:5002${personalInfo.profileImage}`}
               alt={personalInfo.name}
               className="w-full h-full object-cover"
             />
@@ -128,7 +128,7 @@ END:VCARD`.replace(/\n/g, "\r\n")
               animateBy="words"
               direction="top"
               onAnimationComplete={handleAnimationComplete}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-passion mb-2 md:mb-4 text-gray-900 dark:text-white"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans mb-2 md:mb-4 text-gray-900 dark:text-white"
               animationDelay={0.8}
             />
 
@@ -138,7 +138,7 @@ END:VCARD`.replace(/\n/g, "\r\n")
               animateBy="words"
               direction="top"
               onAnimationComplete={handleAnimationComplete}
-              className="text-lg sm:text-xl font-russo md:text-xl text-blue-600 dark:text-blue-400 mb-4 md:mb-6"
+              className="text-lg sm:text-xl font-sans md:text-xl text-blue-600 dark:text-blue-400 mb-4 md:mb-6"
               animationDelay={1.2}
             />
 
@@ -161,12 +161,12 @@ END:VCARD`.replace(/\n/g, "\r\n")
             >
               <div className="flex items-center gap-2">
                 <Icon icon="mdi:email" className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-lg sm:text-xl text-gray-800 font-russo dark:text-gray-200">{personalInfo.email}</span>
+                <span className="text-lg sm:text-xl text-gray-800 font-sans dark:text-gray-200">{personalInfo.email}</span>
               </div>
               <div className="hidden sm:block w-px h-4 bg-gray-400 dark:bg-gray-600" />
               <div className="flex items-center gap-2">
                 <Icon icon="mdi:phone" className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-lg sm:text-xl text-gray-800 font-russo dark:text-gray-200">{personalInfo.mobileNumber}</span>
+                <span className="text-lg sm:text-xl text-gray-800 font-sans dark:text-gray-200">{personalInfo.mobileNumber}</span>
               </div>
             </motion.div>
 
@@ -192,7 +192,7 @@ END:VCARD`.replace(/\n/g, "\r\n")
                 onClick={handleDownloadVCF}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-sm sm:text-base py-2 sm:py-3 px-4 sm:px-6 rounded-full transition-all duration-300 inline-flex items-center gap-2"
               >
-                <span className="font-russo">Get in Touch</span>
+                <span className="font-sans">Get in Touch</span>
                 <motion.span animate={{ x: [0, 5, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1 }}>
                   👋
                 </motion.span>

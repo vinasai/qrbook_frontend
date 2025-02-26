@@ -1,4 +1,4 @@
-import { useAuth } from "./AuthContext"; // Adjust the path as needed
+import { useAuth } from "./AuthContext";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
-import Cookies from "js-cookie";
+import { Mail, Lock, Loader2, Eye, EyeOff, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function LoginForm({
@@ -36,7 +35,7 @@ export function LoginForm({
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch("https://qrbook.ca:5002/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -64,109 +63,148 @@ export function LoginForm({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md ">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-2xl px-4"
+      >
+        <Card className="backdrop-blur-sm bg-black/30 border border-gray-700 shadow-xl">
+          <CardHeader className="space-y-6">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="flex justify-center"
             >
-              <Icons.logo className="h-8 w-8" />
-            </motion.div>
-            <CardTitle className="text-xl font-bold font-russo">Login</CardTitle>
-          </div>
-          <CardDescription className="font-russo text-lg">
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={handleLogin}
-            className={cn("space-y-6", className)}
-            {...props}
-          >
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-4"
-            >
-              <div className="relative">
-                <Label className="font-russo text-xl" htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    className="pl-10"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                </div>
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <QrCode className="h-10 w-10 text-white" />
               </div>
-              <div className="relative">
-                <Label className="font-russo text-xl" htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
+            </motion.div>
+            
+            <div className="text-center space-y-2">
+              <CardTitle className="text-3xl font-bold font-sans text-white">Welcome Back</CardTitle>
+              <CardDescription className="font-sans text-gray-300 text-lg">
+                Sign in to access your account
+              </CardDescription>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="px-6 md:px-10">
+            <form
+              onSubmit={handleLogin}
+              className={cn("space-y-8", className)}
+              {...props}
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-5"
+              >
+                <div className="space-y-2.5">
+                  <Label className="font-sans text-gray-200 text-base" htmlFor="email">Email</Label>
+                  <div className="relative group">
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      className="pl-10 py-6 bg-gray-800/60 border-gray-700 text-gray-200 focus-visible:ring-blue-500 text-base"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  </div>
                 </div>
-                <a
-                  href="#"
-                  className="ml-auto text-md font-russo underline-offset-4 hover:underline block text-right mt-2"
+                
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <Label className="font-sans text-gray-200 text-base" htmlFor="password">Password</Label>
+                    <a
+                      href="#"
+                      className="text-sm font-sans text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Forgot password?
+                    </a>
+                  </div>
+                  <div className="relative group">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      className="pl-10 pr-10 py-6 bg-gray-800/60 border-gray-700 text-gray-200 focus-visible:ring-blue-500 text-base"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 hover:text-gray-300 focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-md bg-red-500/20 border border-red-500/50"
                 >
-                  Forgot your password?
-                </a>
-              </div>
-            </motion.div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <Button className="w-full font-russo text-2xl" type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                "Login"
+                  <p className="text-red-200 text-base font-sans">{error}</p>
+                </motion.div>
               )}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <p className="text-md font-russo text-muted-foreground">
-              Don&apos;t have an account?{" "}
-                <Button  onClick={() => navigate("/register")} variant="link" className="text-primary text-md font-russo">
-                Sign up
+
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <Button 
+                  className="w-full font-sans text-lg py-7 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500" 
+                  type="submit" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
-            </p>
-          </motion.div>
-        </CardFooter>
-      </Card>
+              </motion.div>
+            </form>
+          </CardContent>
+          
+          <CardFooter className="flex justify-center border-t border-gray-800 pt-8 pb-6">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-base font-sans text-gray-400"
+            >
+              Don't have an account?{" "}
+              <Button 
+                onClick={() => navigate("/register")} 
+                variant="link" 
+                className="text-blue-400 hover:text-blue-300 p-0 font-sans"
+              >
+                Create an account
+              </Button>
+            </motion.p>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 }

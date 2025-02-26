@@ -49,34 +49,27 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    // Add form validation here
+
     const formDataToSend = new FormData();
-    
-    // Handle social media separately
-    formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
-    
-    // Handle other fields
     Object.keys(formData).forEach((key) => {
       if (key === 'profileImage' && formData[key]) {
         formDataToSend.append(key, formData[key]);
-      } else if (key !== 'profileImage' && key !== 'socialMedia') {
+      } else if (key !== 'profileImage') {
         formDataToSend.append(key, formData[key]);
       }
     });
-  
+
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/cards/update/${initialData.id}`,
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await axios.put(`https://qrbook.ca:5002/api/cards/update/${initialData.id}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       onSave(response.data);
     } catch (error) {
       console.error('Error updating card:', error);
+      // Handle error appropriately
     }
   };
 

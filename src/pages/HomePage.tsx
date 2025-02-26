@@ -94,23 +94,23 @@ export default function HomePage() {
             animate="visible"
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12"
           >
-            <span className="text-lg font-russo text-primary/60 tracking-wide">QRBook</span>
+            <span className="text-lg font-sans text-primary/60 tracking-wide">QRBook</span>
           </motion.div>
 
           <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 md:mb-8 tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b font-russo from-primary to-primary/80">
+              <span className="bg-clip-text text-transparent bg-gradient-to-b font-sans from-primary to-primary/80">
                 Create Your
               </span>
               <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-primary/90 to-rose-300 font-pacifico">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-primary/90 to-rose-300 font-extrabold">
                 Perfect Landing
               </span>
             </h1>
           </motion.div>
 
           <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
-            <p className="text-md sm:text-lg md:text-xl text-primary/40 mb-8 leading-relaxed font-russo tracking-wide max-w-xl mx-auto px-4">
+            <p className="text-md sm:text-lg md:text-xl text-primary/40 mb-8 leading-relaxed font-sans tracking-wide max-w-xl mx-auto px-4">
               Design, generate, and share stunning landing pages in minutes. Get started with just a few clicks!
             </p>
           </motion.div>
@@ -126,7 +126,7 @@ export default function HomePage() {
               variant="default"
               size="lg"
               onClick={() => (window.location.href = "/creator-form")}
-              className="font-russo text-md px-8 py-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300"
+              className="font-sans text-md px-8 py-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300"
             >
               Create Your Landing Page
             </Button>
@@ -135,7 +135,7 @@ export default function HomePage() {
 
         {/* How It Works Section */}
         <div className="max-w-4xl mx-auto mb-24">
-          <h2 className="text-xl md:text-3xl font-russo text-center text-primary mb-12">How It Works</h2>
+          <h2 className="text-xl md:text-3xl font-sans text-center text-primary mb-12 font-extrabold">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <div
@@ -145,8 +145,8 @@ export default function HomePage() {
                 data-aos-delay={index * 200}
               >
                 <step.icon className="w-12 h-12 mx-auto mb-4 text-indigo-400" />
-                <h3 className="text-lg font-passion text-primary mb-2">{step.title}</h3>
-                <p className="text-primary/60 font-russo text-md">{step.description}</p>
+                <h3 className="text-lg font-sans text-primary mb-2 font-bold">{step.title}</h3>
+                <p className="text-primary/60 font-sans text-md">{step.description}</p>
               </div>
             ))}
           </div>
@@ -154,7 +154,7 @@ export default function HomePage() {
 
         {/* Features Section */}
         <div className="max-w-4xl mx-auto mb-24">
-          <h2 className="text-xl md:text-3xl font-russo text-center text-primary mb-12">Powerful Features</h2>
+          <h2 className="text-xl md:text-3xl font-sans text-center text-primary mb-12 font-extrabold">Powerful Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div
@@ -164,8 +164,8 @@ export default function HomePage() {
                 data-aos-delay={index * 200}
               >
                 <feature.icon className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                <h3 className="text-lg font-passion text-primary mb-2">{feature.title}</h3>
-                <p className="text-primary/60 font-russo  text-md">{feature.description}</p>
+                <h3 className="text-lg font-sans text-primary mb-2 font-bold">{feature.title}</h3>
+                <p className="text-primary/60 font-sans  text-md">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -173,14 +173,14 @@ export default function HomePage() {
 
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto mb-24">
-          <h2 className="text-xl md:text-3xl font-russo text-center text-primary mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-xl md:text-3xl font-sans text-center text-primary font-extrabold mb-12">Frequently Asked Questions</h2>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-primary font-russo text-lg hover:text-indigo-400">
+                <AccordionTrigger className="text-primary font-sans text-lg hover:text-indigo-400">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-primary/60 font-russo text-md">{faq.answer}</AccordionContent>
+                <AccordionContent className="text-primary/60 font-sans text-md">{faq.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -189,7 +189,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative z-10 bg-background border-t border-border py-8">
-        <div className="container text-md mx-auto px-4 md:px-6 font-russo text-center text-primary/60">
+        <div className="container text-md mx-auto px-4 md:px-6 font-sans text-center text-primary/60">
           <p>&copy; 2025 QRBook. All rights reserved.</p>
         </div>
       </footer>

@@ -27,11 +27,11 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="px-4 py-4">
           <div className="flex items-center gap-2 mb-4">
             <QrCode className="h-8 w-8 text-white" />
-            <h2 className="text-2xl font-russo tracking-tight text-white">QRBook</h2>
+            <h2 className="text-2xl font-sans tracking-tight text-white">QRBook</h2>
           </div>
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-white/60" />
-            <h3 className="text-sm font-russo text-white/60">Admin Dashboard</h3>
+            <h3 className="text-sm font-sans text-white/60">Admin Dashboard</h3>
           </div>
         </div>
         <div className="px-3">
@@ -41,7 +41,7 @@ export function Sidebar({ className }: SidebarProps) {
               <Button
                 asChild
                 variant="ghost"
-                className="w-full justify-start hover:bg-white/5 text-white font-russo tracking-wide"
+                className="w-full justify-start hover:bg-white/5 text-white font-sans tracking-wide"
               >
                 <Link to="/payment-info" className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4" />
@@ -51,7 +51,7 @@ export function Sidebar({ className }: SidebarProps) {
               <Button
                 asChild
                 variant="ghost"
-                className="w-full justify-start hover:bg-white/5 text-white font-russo tracking-wide"
+                className="w-full justify-start hover:bg-white/5 text-white font-sans tracking-wide"
               >
                 <Link to="/add-admin" className="flex items-center gap-2">
                   <UserPlus className="h-4 w-4" />
@@ -61,7 +61,7 @@ export function Sidebar({ className }: SidebarProps) {
               <Button
                 asChild
                 variant="ghost"
-                className="w-full justify-start hover:bg-white/5 text-white font-russo tracking-wide"
+                className="w-full justify-start hover:bg-white/5 text-white font-sans tracking-wide"
               >
                 <Link to="/manage-admins" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
@@ -74,7 +74,7 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
       <div className="px-3 mt-auto fixed bottom-4 w-64">
         <Button
-          className="w-full bg-[#fb9797] hover:bg-[#fb9797]/90 text-white font-russo tracking-wide"
+          className="w-full bg-[#fb9797] hover:bg-[#fb9797]/90 text-white font-sans tracking-wide"
           onClick={handleLogout}
         >
           <LogOut className="mr-2 h-4 w-4" />

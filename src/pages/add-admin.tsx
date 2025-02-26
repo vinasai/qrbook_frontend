@@ -6,8 +6,9 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { UserPlus } from "lucide-react"
+import { UserPlus, Loader2 } from "lucide-react"
 import { useState } from "react"
+import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -27,6 +28,7 @@ const formSchema = z.object({
 export default function AddAdmin() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,8 +43,10 @@ export default function AddAdmin() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setError(null)
     setSuccess(null)
+    setIsSubmitting(true)
+    
     try {
-      const response = await fetch("http://localhost:5000/api/users/admin", {
+      const response = await fetch("https://qrbook.ca:5002/api/users/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,20 +59,20 @@ export default function AddAdmin() {
         }),
       })
 
+      const data = await response.json()
+      
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Error: ${response.status} ${response.statusText} - ${errorText}`)
+        throw new Error(data.message || "Failed to create admin")
       }
 
-      const data = await response.json()
       setSuccess("Admin created successfully!")
       form.reset()
+      setTimeout(() => setSuccess(null), 3000)
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message)
-      } else {
-        setError("An unknown error occurred")
-      }
+      setError(error instanceof Error ? error.message : "An unknown error occurred")
+      setTimeout(() => setError(null), 5000)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -79,90 +83,142 @@ export default function AddAdmin() {
   }
 
   return (
-    <div className="p-8 animate-fade-in">
-      <div className="flex items-center gap-3 mb-8">
-        <UserPlus className="h-8 w-8 text-white" />
-        <h1 className="text-4xl font-russo text-white">Add an Admin</h1>
+    <div className="p-8 animate-fade-in space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-sm">
+            <UserPlus className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Add New Admin
+            </h1>
+            <p className="text-muted-foreground font-medium mt-1">
+              Create new administrator accounts with system access
+            </p>
+          </div>
+        </div>
       </div>
-      <div className="rounded-xl bg-[#1f1f1f] p-6 max-w-2xl border border-white/10 shadow-lg">
+
+      {/* Form Card */}
+      <div className="rounded-xl border bg-background/95 backdrop-blur-sm shadow-lg max-w-2xl">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+            {error && (
+              <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/30">
+                <p className="text-destructive flex items-center gap-2">
+                  <span className="text-sm font-medium">{error}</span>
+                </p>
+              </div>
+            )}
+
+            {success && (
+              <div className="rounded-lg bg-emerald-500/10 p-4 border border-emerald-500/30">
+                <p className="text-emerald-500 flex items-center gap-2">
+                  <span className="text-sm font-medium">{success}</span>
+                </p>
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Name</FormLabel>
+                  <FormLabel className="font-medium">Full Name</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#2a2a2a] border-0 text-white h-12 focus-visible:ring-white/20" />
+                    <Input
+                      {...field}
+                      className="focus-visible:ring-primary/20"
+                      placeholder="John Doe"
+                    />
                   </FormControl>
-                  <FormMessage className="text-[#fb9797]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Mobile No</FormLabel>
+                  <FormLabel className="font-medium">Mobile Number</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="tel"
-                      className="bg-[#2a2a2a] border-0 text-white h-12 focus-visible:ring-white/20"
+                      className="focus-visible:ring-primary/20"
+                      placeholder="+1 234 567 890"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#fb9797]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">E-Mail</FormLabel>
+                  <FormLabel className="font-medium">Email Address</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="email"
-                      className="bg-[#2a2a2a] border-0 text-white h-12 focus-visible:ring-white/20"
+                      className="focus-visible:ring-primary/20"
+                      placeholder="admin@example.com"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#fb9797]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Password</FormLabel>
+                  <FormLabel className="font-medium">Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="password"
-                      className="bg-[#2a2a2a] border-0 text-white h-12 focus-visible:ring-white/20"
+                      className="focus-visible:ring-primary/20"
+                      placeholder="••••••••"
                     />
                   </FormControl>
-                  <FormMessage className="text-[#fb9797]" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
-            {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
+
             <div className="flex justify-end gap-4 pt-4">
               <Button
                 type="button"
                 onClick={onReset}
-                className="bg-[#2a2a2a] text-white hover:bg-[#2a2a2a]/90 px-8 font-russo"
+                variant="secondary"
+                className="px-8"
+                disabled={isSubmitting}
               >
                 Reset
               </Button>
-              <Button type="submit" className="bg-white text-black hover:bg-white/90 px-8 font-russo">
-                Done
+              <Button 
+                type="submit" 
+                className="px-8 gap-2"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Admin"
+                )}
               </Button>
             </div>
           </form>

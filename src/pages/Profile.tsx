@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { z } from "zod"
-import { User, Mail, Phone, Lock, Edit2, Activity, Camera } from "lucide-react"
+import { User, Mail, Phone, Lock, Edit2, Camera, ArrowLeft } from "lucide-react"
 import Cookies from "js-cookie"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,8 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { EditProfileForm } from "../components/EditProfileForm"
 import { ChangePasswordForm } from "../components/ChangePasswordForm"
-import { ActivityFeed } from "../components/ActivityFeed"
-import { ConnectedAccounts } from "../components/ConnectedAccounts"
 import { Badge } from "@/components/ui/badge"
 
 const profileSchema = z.object({
@@ -41,7 +39,7 @@ export default function Profile() {
           throw new Error("Authentication required")
         }
 
-        const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,6 +78,16 @@ export default function Profile() {
       >
         <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 shadow-xl">
           <CardHeader className="relative pb-0">
+            <div className="absolute top-4 left-4">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full"
+                onClick={() => window.history.back()}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </div>
             <div className="absolute top-4 right-4 space-x-2 font-geo">
               <Badge variant="outline" className="text-xs sm:text-sm">
                 {userData.role || "User"}
@@ -90,13 +98,10 @@ export default function Profile() {
             </div>
             <div className="flex flex-col items-center">
               <div className="relative">
-                <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary">
-                  <AvatarImage src={userData.avatarUrl} alt={userData.fullName} />
-                  <AvatarFallback>{userData.fullName.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <Button size="icon" className="absolute bottom-0 right-0 rounded-full" variant="secondary">
-                  <Camera className="h-4 w-4" />
-                </Button>
+              <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary">
+                <AvatarImage src={userData.avatarUrl} alt={userData.fullName} />
+                <AvatarFallback>{userData.fullName.charAt(0)}</AvatarFallback>
+              </Avatar>
               </div>
               <CardTitle className="text-2xl sm:text-4xl font-geo mt-4">{userData.fullName}</CardTitle>
               <CardDescription className="text-lg sm:text-2xl font-geo">{userData.email}</CardDescription>
@@ -104,19 +109,13 @@ export default function Profile() {
           </CardHeader>
 
           <CardContent className="mt-6">
-            <Tabs defaultValue="profile" className="w-full font-russo">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 rounded-full">
+            <Tabs defaultValue="profile" className="w-full font-sans">
+              <TabsList className="grid w-full grid-cols-2 rounded-full">
                 <TabsTrigger value="profile" className="rounded-full text-xs sm:text-sm">
                   Profile
                 </TabsTrigger>
-                <TabsTrigger value="activity" className="rounded-full text-xs sm:text-sm">
-                  Activity
-                </TabsTrigger>
                 <TabsTrigger value="security" className="rounded-full text-xs sm:text-sm">
                   Security
-                </TabsTrigger>
-                <TabsTrigger value="connected" className="rounded-full text-xs sm:text-sm">
-                  Connected
                 </TabsTrigger>
               </TabsList>
               <AnimatePresence mode="wait">
@@ -134,14 +133,8 @@ export default function Profile() {
                       profileCompletionPercentage={profileCompletionPercentage}
                     />
                   </TabsContent>
-                  <TabsContent value="activity">
-                    <ActivityFeed userId={userData.id} />
-                  </TabsContent>
                   <TabsContent value="security">
                     <SecurityTab />
-                  </TabsContent>
-                  <TabsContent value="connected">
-                    <ConnectedAccounts userId={userData.id} />
                   </TabsContent>
                 </motion.div>
               </AnimatePresence>
@@ -162,7 +155,7 @@ function ProfileTab({ userData, setUserData, profileCompletionPercentage }) {
         <ProfileItem icon={User} label="Name" value={userData.fullName} />
         <ProfileItem icon={Mail} label="Email" value={userData.email} />
         <ProfileItem icon={Phone} label="Phone" value={userData.mobileNo || "-"} />
-        <ProfileItem icon={Activity} label="Last Active" value={userData.lastActive || "Today"} />
+        <ProfileItem icon={Lock} label="Last Active" value={userData.lastActive || "Today"} />
       </div>
 
       <Separator />
@@ -211,7 +204,6 @@ function SecurityTab() {
           <ChangePasswordForm onClose={() => setIsDialogOpen(false)} />
         </DialogContent>
       </Dialog>
-      {/* Add more security options here */}
     </div>
   )
 }
@@ -229,8 +221,7 @@ function ProfileItem({ icon: Icon, label, value }) {
 }
 
 function calculateProfileCompletion(userData) {
-  const fields = ["fullName", "email", "mobileNo", "avatarUrl"]
+  const fields = ["fullName", "email", "mobileNo"] // Removed avatarUrl
   const completedFields = fields.filter((field) => userData[field])
   return Math.round((completedFields.length / fields.length) * 100)
 }
-

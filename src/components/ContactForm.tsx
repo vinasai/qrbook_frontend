@@ -8,7 +8,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
   return (
     <div className="space-y-4">
       <div>
-        <Label className="font-russo text-md" htmlFor="mobileNumber">Mobile Number</Label>
+        <Label className="font-sans text-md" htmlFor="mobileNumber">Mobile Number</Label>
         <div className="relative">
           <FontAwesomeIcon
             icon={faPhone}
@@ -28,7 +28,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         )}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="email">Email</Label>
+        <Label className="font-sans text-md" htmlFor="email">Email</Label>
         <div className="relative">
           <FontAwesomeIcon
             icon={faEnvelope}
@@ -49,7 +49,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         )}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="description">Description</Label>
+        <Label className="font-sans text-md" htmlFor="description">Description</Label>
         <Textarea
           id="description"
           name="description"

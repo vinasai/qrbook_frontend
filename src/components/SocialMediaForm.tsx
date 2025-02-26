@@ -44,7 +44,7 @@ export default function SocialMediaForm({
         type="button"
         variant="outline"
         onClick={addSocialMediaLink}
-        className="w-full font-russo text-lg"
+        className="w-full font-sans text-lg"
       >
         <FontAwesomeIcon icon={faPlus} className="mr-2 " />
         Add Social Media Link

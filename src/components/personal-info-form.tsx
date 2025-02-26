@@ -7,7 +7,7 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
   return (
     <div className="space-y-4">
       <div>
-        <Label className="font-russo text-md" htmlFor="name">
+        <Label className="font-sans text-md" htmlFor="name">
           Full Name
         </Label>
         <div className="relative">
@@ -24,7 +24,7 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
         {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="pronouns">
+        <Label className="font-sans text-md" htmlFor="pronouns">
           Pronouns
         </Label>
         <div className="relative">
@@ -41,7 +41,7 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
         {errors.pronouns && <p className="text-sm text-red-500 mt-1">{errors.pronouns}</p>}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="jobPosition">
+        <Label className="font-sans text-md" htmlFor="jobPosition">
           Job Position
         </Label>
         <div className="relative">
@@ -61,7 +61,7 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
         {errors.jobPosition && <p className="text-sm text-red-500 mt-1">{errors.jobPosition}</p>}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="profileImage">
+        <Label className="font-sans text-md" htmlFor="profileImage">
           Profile Image
         </Label>
         <div className="flex items-center space-x-4">
@@ -76,7 +76,7 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
               className="w-24 h-24 rounded-full object-cover"
             />
           )}
-          <Input className="font-russo" id="profileImage" name="profileImage" type="file" onChange={handleFileChange} />
+          <Input className="font-sans" id="profileImage" name="profileImage" type="file" onChange={handleFileChange} />
         </div>
         {errors.profileImage && <p className="text-sm text-red-500 mt-1">{errors.profileImage}</p>}
       </div>

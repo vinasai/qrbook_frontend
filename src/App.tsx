@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,7 +12,6 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "./components/Navbar";
-import type { User } from "./types/user";
 import { AuthProvider } from "./components/AuthContext";
 import MyQRs from "./pages/MyQRs";
 import HomePage from "./pages/HomePage";
@@ -26,12 +25,12 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <AuthProvider>
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-          <Router>
+        <Router>
+          <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
             <ConditionalNavbar />
             <div className="flex">
               <ConditionalSidebar />
-              <main className="p-4 flex-1">
+              <main className="p-4 flex-1 pt-16"> {/* Added pt-16 for navbar spacing */}
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<Login />} />
@@ -77,8 +76,8 @@ function App() {
                 </Routes>
               </main>
             </div>
-          </Router>
-        </div>
+          </div>
+        </Router>
       </AuthProvider>
     </ThemeProvider>
   );
@@ -86,37 +85,38 @@ function App() {
 
 function ConditionalNavbar() {
   const location = useLocation();
+  
+  // List of paths where navbar should NOT appear
+  const hideNavbarPaths = [
+    '/login',
+    '/register',
+    // Match single segment paths except profile and myqrs
+    (path: string) => /^\/[^/]+$/.test(path) && !['/profile', '/myqrs'].includes(path)
+  ];
 
-  // Exclude specific routes
-  if (
-    location.pathname.startsWith("/business-card") ||
-    location.pathname.startsWith("/payment-info") ||
-    location.pathname.startsWith("/add-admin") ||
-    location.pathname.startsWith("/manage-admins")
-  ) {
+  const shouldHideNavbar = hideNavbarPaths.some(condition => {
+    if (typeof condition === 'function') {
+      return condition(location.pathname);
+    }
+    return location.pathname === condition;
+  });
+
+  if (shouldHideNavbar) {
     return null;
   }
 
-  // Exclude single-segment routes except for "/myqrs"
-  if (/^\/[^/]+$/.test(location.pathname) && location.pathname !== "/myqrs") {
-    return null;
-  }
-
-  return <Navbar />;
+  return <Navbar className="fixed top-0 w-full z-50 shadow-sm" />;
 }
 
 function ConditionalSidebar() {
   const location = useLocation();
-  return location.pathname.startsWith("/business-card") ||
-    location.pathname === "/" ||
-    location.pathname.startsWith("/creator-form") ||
-    location.pathname.startsWith("/login") ||
-    location.pathname.startsWith("/register") ||
-    location.pathname.startsWith("/profile") ||
-    location.pathname.startsWith("/myqrs") ||
-    /^\/[^/]+$/.test(location.pathname) // Exclude paths with a single segment (e.g., /:id)
-    ? null
-    : <Sidebar />;
+  const showSidebarPaths = ['/payment-info', '/add-admin', '/manage-admins'];
+
+  return showSidebarPaths.some(path => 
+    location.pathname.startsWith(path)
+  ) ? (
+    <Sidebar className="left-0 top-0 h-screen w-64 z-40 shadow-lg" />
+  ) : null;
 }
 
 export default App;

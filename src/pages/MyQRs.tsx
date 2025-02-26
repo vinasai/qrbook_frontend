@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Search, Download, Filter, MoreVertical, Pencil } from 'lucide-react'
+import { useNavigate, Link } from "react-router-dom"
+import { Search, Download, Filter, MoreVertical, Pencil, Plus } from 'lucide-react'
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Card, CardContent } from "../components/ui/card"
@@ -24,7 +24,7 @@ import {
 import QRCode from "qrcode.react"
 import axios from "axios"
 import Cookies from "js-cookie"
-import EditBusinessCardForm from '../components/edit-business-card-form';
+import EditBusinessCardForm from '../components/edit-business-card-form'
 
 type Card = {
   id: string
@@ -41,32 +41,55 @@ export default function MyQRs() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingCard, setEditingCard] = useState<Card | null>(null);
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingCard, setEditingCard] = useState<Card | null>(null)
   const cardsPerPage = 8
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        setLoading(true)
-        const userId = Cookies.get("userId")
-        if (!userId) {
-          throw new Error("User ID not found in cookies")
-        }
-        const response = await axios.get(`http://localhost:5000/api/cards/user/${userId}`)
-        setCards(response.data)
-        setFilteredCards(response.data)
-      } catch (error) {
-        console.error("Error fetching cards:", error)
-        setError("Failed to fetch cards. Please try again later.")
-      } finally {
-        setLoading(false)
-      }
-    }
+        setLoading(true);
+        const userId = Cookies.get("userId");
+        const token = Cookies.get("token");
 
-    fetchCards()
-  }, [])
+        if (!userId || !token) {
+          throw new Error("Authentication required");
+        }
+
+        const response = await axios.get(
+          `https://qrbook.ca:5002/api/cards/user/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // If response is empty array, let it fall through to empty state
+        setCards(response.data);
+        setFilteredCards(response.data);
+        setError(""); // Clear any previous errors
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 404 && error.response?.data?.message === "No cards found for this user") {
+            // Handle empty state
+            setCards([]);
+            setFilteredCards([]);
+            setError("");
+          } else {
+            setError(error.response?.data?.message || "Failed to fetch cards. Please try again later.");
+          }
+        } else {
+          setError("Failed to fetch cards. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   useEffect(() => {
     const results = cards.filter((card) => card.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -86,11 +109,9 @@ export default function MyQRs() {
   }, [filter, cards])
 
   const handleDownload = (id: string, name: string) => {
-    // Get the QR code canvas element by ID
     const canvas = document.getElementById(`qr-code-${id}`) as HTMLCanvasElement
     if (!canvas) return
 
-    // Convert canvas to data URL and trigger download
     const url = canvas.toDataURL("image/png")
     const a = document.createElement("a")
     a.href = url
@@ -101,29 +122,29 @@ export default function MyQRs() {
   }
 
   const handlePreview = (id: string) => {
-    navigate(`/${id}`);
-  };
+    navigate(`/${id}`)
+  }
 
   const handleEdit = (card: Card) => {
-    setEditingCard(card);
-    setIsEditing(true);
-  };
+    setEditingCard(card)
+    setIsEditing(true)
+  }
 
   const handleCloseEdit = () => {
-    setIsEditing(false);
-    setEditingCard(null);
-  };
+    setIsEditing(false)
+    setEditingCard(null)
+  }
 
   const indexOfLastCard = currentPage * cardsPerPage
   const indexOfFirstCard = indexOfLastCard - cardsPerPage
   const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard)
 
   return (
-    <div className="min-h-screen p-4 sm:p-8  mt-8">
+    <div className="min-h-screen p-4 sm:p-8 mt-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-russo bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-sans bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               My QRs
             </h1>
             <p className="text-muted-foreground">Manage and customize your QR codes</p>
@@ -164,6 +185,40 @@ export default function MyQRs() {
           </div>
         ) : error ? (
           <div className="text-center text-red-500 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">{error}</div>
+        ) : filteredCards.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center py-12">
+            <div className="max-w-md mx-auto">
+              <svg
+                className="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h4M4 8h16M4 4h16"
+                />
+              </svg>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                No QR Codes Found
+              </h3>
+              <p className="text-muted-foreground mb-8">
+                {searchTerm ? "No results match your search." : "Get started by creating your first QR code."}
+              </p>
+              <Button
+                asChild
+                className="bg-primary hover:bg-primary/90 px-8 py-4 text-lg rounded-full"
+              >
+                <Link to="/creator-form">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create Your First QR
+                </Link>
+              </Button>
+            </div>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -256,9 +311,10 @@ export default function MyQRs() {
               initialData={editingCard}
               onClose={handleCloseEdit}
               onSave={(updatedCard) => {
-                // Here you would typically update the card in your state and/or send to the server
-                console.log('Updated card:', updatedCard);
-                handleCloseEdit();
+                // Update the card in state
+                setCards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c))
+                setFilteredCards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c))
+                handleCloseEdit()
               }}
             />
           </div>
