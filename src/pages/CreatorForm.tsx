@@ -155,7 +155,7 @@ export default function CreatorForm() {
     try {
       // Send the request to the backend
       const response = await axios.post(
-        "http://localhost:5000/api/cards",
+        "https://qrbook.ca:5002/api/cards",
         formDataWithFile,
         {
           headers: {
@@ -208,10 +208,10 @@ export default function CreatorForm() {
     <div className="min-h-screen  p-8 mt-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-xl font-russo text-center">
+          <CardTitle className="text-xl font-sans text-center">
             Create Your Digital Business Card
           </CardTitle>
-          <CardDescription className="text-center font-russo text-lg">
+          <CardDescription className="text-center font-sans text-lg">
             Generate a beautiful, shareable digital business card with QR code
             in minutes
           </CardDescription>
@@ -225,7 +225,7 @@ export default function CreatorForm() {
                   value={index.toString()}
                   onClick={() => setCurrentStep(index)}
                   disabled={index > currentStep}
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-russo"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-sans"
                 >
                   <FontAwesomeIcon icon={step.icon} className="mr-2 " />
                   {step.title}
@@ -262,7 +262,7 @@ export default function CreatorForm() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button
-            className="font-russo"
+            className="font-sans"
             variant="outline"
             onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
             disabled={currentStep === 0}
@@ -271,7 +271,7 @@ export default function CreatorForm() {
           </Button>
           {currentStep < steps.length - 1 ? (
             <Button
-              className="font-russo"
+              className="font-sans"
               onClick={() => {
                 const currentStepErrors = validateForm(formData, currentStep);
                 if (Object.keys(currentStepErrors).length > 0) {

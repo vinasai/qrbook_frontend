@@ -8,7 +8,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
   return (
     <div className="space-y-4">
       <div>
-        <Label className="font-russo text-md" htmlFor="mobileNumber">
+        <Label className="font-sans text-md" htmlFor="mobileNumber">
           Mobile Number
         </Label>
         <div className="relative">
@@ -28,7 +28,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         {errors.mobileNumber && <p className="text-sm text-red-500 mt-1">{errors.mobileNumber}</p>}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="email">
+        <Label className="font-sans text-md" htmlFor="email">
           Email
         </Label>
         <div className="relative">
@@ -49,7 +49,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
       </div>
       <div>
-        <Label className="font-russo text-md" htmlFor="description">
+        <Label className="font-sans text-md" htmlFor="description">
           Description
         </Label>
         <Textarea

@@ -54,7 +54,7 @@ export default function MyQRs() {
         if (!userId) {
           throw new Error("User ID not found in cookies")
         }
-        const response = await axios.get(`http://localhost:5000/api/cards/user/${userId}`)
+        const response = await axios.get(`https://qrbook.ca:5002/api/cards/user/${userId}`)
         setCards(response.data)
         setFilteredCards(response.data)
       } catch (error) {
@@ -123,7 +123,7 @@ export default function MyQRs() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-russo bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-sans bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               My QRs
             </h1>
             <p className="text-muted-foreground">Manage and customize your QR codes</p>

@@ -28,7 +28,7 @@ export default function ManageAdmins() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/users/admins?page=${currentPage}&limit=5`
+        `https://qrbook.ca:5002/api/users/admins?page=${currentPage}&limit=5`
       );
       if (!response.ok) {
         const errorText = await response.text();
@@ -54,7 +54,7 @@ export default function ManageAdmins() {
     if (!newEmail || !newName) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName: newName, email: newEmail })
@@ -71,7 +71,7 @@ export default function ManageAdmins() {
     if (!confirm('Are you sure you want to delete this admin?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
         method: 'DELETE'
       });
 
@@ -92,22 +92,22 @@ export default function ManageAdmins() {
     <div className="p-8 animate-fade-in">
       <div className="flex items-center gap-3 mb-8">
         <Users className="h-8 w-8 text-white" />
-        <h1 className="text-4xl font-russo text-white">Manage Admins</h1>
+        <h1 className="text-4xl font-sans text-white">Manage Admins</h1>
       </div>
       <div className="rounded-xl bg-[#1f1f1f] p-6 border border-white/10 shadow-lg">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-white/10 hover:bg-transparent">
-              <TableHead className="text-white font-russo">Name</TableHead>
-              <TableHead className="text-white font-russo">E-Mail</TableHead>
-              <TableHead className="text-right font-russo text-white">Manage</TableHead>
+              <TableHead className="text-white font-sans">Name</TableHead>
+              <TableHead className="text-white font-sans">E-Mail</TableHead>
+              <TableHead className="text-right font-sans text-white">Manage</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {admins.map((admin) => (
               <TableRow key={admin.userId} className="border-b border-white/10 hover:bg-white/5">
-                <TableCell className="text-white font-russo">{admin.fullName}</TableCell>
-                <TableCell className="text-white font-russo">{admin.email}</TableCell>
+                <TableCell className="text-white font-sans">{admin.fullName}</TableCell>
+                <TableCell className="text-white font-sans">{admin.email}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -147,7 +147,7 @@ export default function ManageAdmins() {
                 <PaginationItem key={i}>
                   <PaginationLink
                     isActive={i + 1 === currentPage}
-                    className="font-russo"
+                    className="font-sans"
                     onClick={() => setCurrentPage(i + 1)}
                   >
                     {i + 1}

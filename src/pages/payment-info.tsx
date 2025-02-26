@@ -29,7 +29,7 @@ export default function PaymentInfo() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/cards?page=${currentPage}&limit=${itemsPerPage}`
+          `https://qrbook.ca:5002/api/cards?page=${currentPage}&limit=${itemsPerPage}`
         );
         const data = await response.json();
         setCards(data.cards);
@@ -47,7 +47,7 @@ export default function PaymentInfo() {
 
     try {
       // Update payment status
-      const updateResponse = await fetch(`http://localhost:5000/api/cards/${cardId}`, {
+      const updateResponse = await fetch(`https://qrbook.ca:5002/api/cards/${cardId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentConfirmed: !currentConfirmed }),
@@ -57,7 +57,7 @@ export default function PaymentInfo() {
       
       // Refresh data after update
       const refreshResponse = await fetch(
-        `http://localhost:5000/api/cards?page=${currentPage}&limit=${itemsPerPage}`
+        `https://qrbook.ca:5002/api/cards?page=${currentPage}&limit=${itemsPerPage}`
       );
       const newData = await refreshResponse.json();
       setCards(newData.cards);
@@ -71,7 +71,7 @@ export default function PaymentInfo() {
     <div className="p-8 animate-fade-in">
       <div className="flex items-center gap-3 mb-8">
         <CreditCard className="h-8 w-8 text-white" />
-        <h1 className="text-4xl font-russo text-white">Payment Info</h1>
+        <h1 className="text-4xl font-sans text-white">Payment Info</h1>
       </div>
       <div className="rounded-xl bg-[#1f1f1f] p-6 border border-white/10 shadow-lg">
         <PaymentTable cards={cards} onPaymentConfirmedChange={handlePaymentUpdate} />
@@ -99,7 +99,7 @@ export default function PaymentInfo() {
                       setCurrentPage(page);
                     }}
                     isActive={page === currentPage}
-                    className="font-russo"
+                    className="font-sans"
                   >
                     {page}
                   </PaginationLink>

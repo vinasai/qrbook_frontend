@@ -42,7 +42,7 @@ export default function AddAdmin() {
     setError(null)
     setSuccess(null)
     try {
-      const response = await fetch("http://localhost:5000/api/users/admin", {
+      const response = await fetch("https://qrbook.ca:5002/api/users/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function AddAdmin() {
     <div className="p-8 animate-fade-in">
       <div className="flex items-center gap-3 mb-8">
         <UserPlus className="h-8 w-8 text-white" />
-        <h1 className="text-4xl font-russo text-white">Add an Admin</h1>
+        <h1 className="text-4xl font-sans text-white">Add an Admin</h1>
       </div>
       <div className="rounded-xl bg-[#1f1f1f] p-6 max-w-2xl border border-white/10 shadow-lg">
         <Form {...form}>
@@ -92,7 +92,7 @@ export default function AddAdmin() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Name</FormLabel>
+                  <FormLabel className="text-white text-xl font-sans">Name</FormLabel>
                   <FormControl>
                     <Input {...field} className="bg-[#2a2a2a] border-0 text-white h-12 focus-visible:ring-white/20" />
                   </FormControl>
@@ -105,7 +105,7 @@ export default function AddAdmin() {
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Mobile No</FormLabel>
+                  <FormLabel className="text-white text-xl font-sans">Mobile No</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -122,7 +122,7 @@ export default function AddAdmin() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">E-Mail</FormLabel>
+                  <FormLabel className="text-white text-xl font-sans">E-Mail</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -139,7 +139,7 @@ export default function AddAdmin() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white text-xl font-russo">Password</FormLabel>
+                  <FormLabel className="text-white text-xl font-sans">Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -157,11 +157,11 @@ export default function AddAdmin() {
               <Button
                 type="button"
                 onClick={onReset}
-                className="bg-[#2a2a2a] text-white hover:bg-[#2a2a2a]/90 px-8 font-russo"
+                className="bg-[#2a2a2a] text-white hover:bg-[#2a2a2a]/90 px-8 font-sans"
               >
                 Reset
               </Button>
-              <Button type="submit" className="bg-white text-black hover:bg-white/90 px-8 font-russo">
+              <Button type="submit" className="bg-white text-black hover:bg-white/90 px-8 font-sans">
                 Done
               </Button>
             </div>

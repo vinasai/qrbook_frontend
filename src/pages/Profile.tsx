@@ -41,7 +41,7 @@ export default function Profile() {
           throw new Error("Authentication required")
         }
 
-        const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -104,7 +104,7 @@ export default function Profile() {
           </CardHeader>
 
           <CardContent className="mt-6">
-            <Tabs defaultValue="profile" className="w-full font-russo">
+            <Tabs defaultValue="profile" className="w-full font-sans">
               <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 rounded-full">
                 <TabsTrigger value="profile" className="rounded-full text-xs sm:text-sm">
                   Profile
