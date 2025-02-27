@@ -39,7 +39,7 @@ export default function Profile() {
           throw new Error("Authentication required")
         }
 
-        const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
+        const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -88,7 +88,7 @@ export default function Profile() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </div>
-            <div className="absolute top-4 right-4 space-x-2 font-geo">
+            <div className="absolute top-4 right-4 space-x-2 font-sans">
               <Badge variant="outline" className="text-xs sm:text-sm">
                 {userData.role || "User"}
               </Badge>
@@ -103,8 +103,8 @@ export default function Profile() {
                 <AvatarFallback>{userData.fullName.charAt(0)}</AvatarFallback>
               </Avatar>
               </div>
-              <CardTitle className="text-2xl sm:text-4xl font-geo mt-4">{userData.fullName}</CardTitle>
-              <CardDescription className="text-lg sm:text-2xl font-geo">{userData.email}</CardDescription>
+              <CardTitle className="text-2xl sm:text-4xl font-sans mt-4">{userData.fullName}</CardTitle>
+              <CardDescription className="text-lg sm:text-2xl font-sans">{userData.email}</CardDescription>
             </div>
           </CardHeader>
 

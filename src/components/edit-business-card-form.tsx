@@ -61,7 +61,7 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
     });
 
     try {
-      const response = await axios.put(`https://qrbook.ca:5002/api/cards/update/${initialData.id}`, formDataToSend, {
+      const response = await axios.put(`https://qrbook.ca/api/cards/update/${initialData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

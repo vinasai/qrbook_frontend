@@ -28,7 +28,7 @@ export default function ManageAdmins() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://qrbook.ca:5002/api/users/admins?page=${currentPage}&limit=5`
+        `https://qrbook.ca/api/users/admins?page=${currentPage}&limit=5`
       );
       if (!response.ok) {
         const errorText = await response.text();
@@ -54,7 +54,7 @@ export default function ManageAdmins() {
     if (!newEmail || !newName) return;
 
     try {
-      const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
+      const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName: newName, email: newEmail })
@@ -71,7 +71,7 @@ export default function ManageAdmins() {
     if (!confirm('Are you sure you want to delete this admin?')) return;
 
     try {
-      const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
+      const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
         method: 'DELETE'
       });
 

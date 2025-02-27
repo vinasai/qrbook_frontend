@@ -35,7 +35,7 @@ export function LoginForm({
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://qrbook.ca:5002/api/users/login", {
+      const response = await fetch("https://qrbook.ca/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

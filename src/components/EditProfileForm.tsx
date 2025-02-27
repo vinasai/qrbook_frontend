@@ -48,7 +48,7 @@ export function EditProfileForm({ userData, setUserData, onClose }: EditProfileF
         throw new Error("Authentication required")
       }
 
-      const response = await fetch(`https://qrbook.ca:5002/api/users/${userId}`, {
+      const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
