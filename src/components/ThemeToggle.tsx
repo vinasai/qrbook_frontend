@@ -8,7 +8,6 @@ const ThemeToggle: React.FC = () => {
 
   const toggleTheme = () => {
     if (theme === "dark") setTheme("light");
-    else if (theme === "light") setTheme("system");
     else setTheme("dark");
   };
 
@@ -23,9 +22,7 @@ const ThemeToggle: React.FC = () => {
         icon={
           theme === "light"
             ? "mdi:weather-night"
-            : theme === "dark"
-            ? "mdi:weather-sunny"
-            : "mdi:desktop-classic"
+            : "mdi:weather-sunny"
         }
         className="w-6 h-6 text-gray-800 dark:text-gray-200"
       />

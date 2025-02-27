@@ -12,6 +12,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Card {
   _id: string;
@@ -29,6 +37,10 @@ export default function PaymentInfo() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [newPaymentStatus, setNewPaymentStatus] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -36,7 +48,7 @@ export default function PaymentInfo() {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://qrbook.ca:5002/api/cards?page=${currentPage}&limit=${itemsPerPage}`
+          `http://localhost:5000/api/cards?page=${currentPage}&limit=${itemsPerPage}`
         );
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
@@ -52,24 +64,43 @@ export default function PaymentInfo() {
     fetchData();
   }, [currentPage, itemsPerPage]);
 
-  const handlePaymentUpdate = async (cardId: string, currentConfirmed: boolean) => {
+  const handlePaymentUpdate = async () => {
+    if (!selectedCard) return;
+    
     try {
-      const updateResponse = await fetch(`https://qrbook.ca:5002/api/cards/${cardId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentConfirmed: !currentConfirmed }),
-      });
+      setIsUpdating(true);
+      const updateResponse = await fetch(
+        `http://localhost:5000/api/cards/${selectedCard._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentConfirmed: newPaymentStatus }),
+        }
+      );
 
       if (!updateResponse.ok) throw new Error("Update failed");
-      
-      setCards(prev => prev.map(card => 
-        card._id === cardId ? { ...card, paymentConfirmed: !currentConfirmed } : card
-      ));
+
+      setCards((prev) =>
+        prev.map((card) =>
+          card._id === selectedCard._id
+            ? { ...card, paymentConfirmed: newPaymentStatus }
+            : card
+        )
+      );
+      setShowConfirmDialog(false);
     } catch (error) {
       console.error("Error updating payment:", error);
       setError("Failed to update payment status");
       setTimeout(() => setError(""), 3000);
+    } finally {
+      setIsUpdating(false);
     }
+  };
+
+  const handleSwitchChange = (card: Card, newStatus: boolean) => {
+    setSelectedCard(card);
+    setNewPaymentStatus(newStatus);
+    setShowConfirmDialog(true);
   };
 
   if (error) {
@@ -87,6 +118,41 @@ export default function PaymentInfo() {
 
   return (
     <div className="p-8 animate-fade-in space-y-8">
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Payment Status Change</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to{" "}
+              <span className="font-semibold">
+                {newPaymentStatus ? "confirm" : "unconfirm"}
+              </span>{" "}
+              payment for {selectedCard?.name}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+              disabled={isUpdating}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handlePaymentUpdate} disabled={isUpdating}>
+              {isUpdating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Confirm Change"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
@@ -114,18 +180,12 @@ export default function PaymentInfo() {
           </div>
         ) : (
           <>
-            <PaymentTable 
-              cards={cards} 
-              renderSwitch={(card) => (
-                <Switch
-                  checked={card.paymentConfirmed}
-                  onCheckedChange={() => 
-                    handlePaymentUpdate(card._id, card.paymentConfirmed)
-                  }
-                  className="data-[state=checked]:bg-primary"
-                />
-              )}
-            />
+            <PaymentTable
+  cards={cards}
+  onPaymentConfirmedChange={(cardId, currentConfirmed) => 
+    handleSwitchChange(cards.find(c => c._id === cardId)!, !currentConfirmed)
+  }
+/>
             
             {/* Pagination */}
             <div className="border-t p-4">
