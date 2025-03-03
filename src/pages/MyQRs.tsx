@@ -58,7 +58,7 @@ export default function MyQRs() {
         }
 
         const response = await axios.get(
-          `https://qrbook.ca/api/cards/user/${userId}`,
+          `https://qrbook.ca:5002/api/cards/user/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -173,6 +173,18 @@ export default function MyQRs() {
                 <DropdownMenuItem onClick={() => setFilter("permanent")}>Permanent Links</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {cards.length > 0 && (
+      <Button
+      asChild
+      className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 py-2.5 font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+    >
+      <Link to="/creator-form" className="flex items-center gap-2">
+        <Plus className="w-4 h-4 shrink-0" />
+        <span className="hidden sm:inline">Create a New QR</span>
+        <span className="sm:hidden">Create a New QR</span>
+      </Link>
+    </Button>
+    )}
           </div>
         </header>
 
