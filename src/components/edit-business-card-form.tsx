@@ -1,67 +1,69 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import PersonalInfoForm from "./personal-info-form"
-import ContactForm from "./contact-form"
-import SocialMediaForm from "./social-media-form"
-import axios from 'axios';
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import PersonalInfoForm from "./personal-info-form";
+import ContactForm from "./contact-form";
+import SocialMediaForm from "./social-media-form";
+import axios from "axios";
 
 interface EditBusinessCardFormProps {
-  initialData: any // Replace 'any' with your Card type
-  onClose: () => void
-  onSave: (updatedCard: any) => void // Replace 'any' with your Card type
+  initialData: any; // Replace 'any' with your Card type
+  onClose: () => void;
+  onSave: (updatedCard: any) => void; // Replace 'any' with your Card type
 }
 
 export default function EditBusinessCardForm({ initialData, onClose, onSave }: EditBusinessCardFormProps) {
-  const [formData, setFormData] = useState(initialData)
-  const [errors, setErrors] = useState({})
+  const [formData, setFormData] = useState(initialData);
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    setFormData((prev) => ({ ...prev, profileImage: file }))
-  }
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, profileImage: file }));
+  };
 
   const handleSocialMediaChange = (index, field, value) => {
-    const updatedSocialMedia = [...formData.socialMedia]
-    updatedSocialMedia[index][field] = value
-    setFormData((prev) => ({ ...prev, socialMedia: updatedSocialMedia }))
-  }
+    const updatedSocialMedia = [...formData.socialMedia];
+    updatedSocialMedia[index][field] = value;
+    setFormData((prev) => ({ ...prev, socialMedia: updatedSocialMedia }));
+  };
 
   const addSocialMediaLink = () => {
     setFormData((prev) => ({
       ...prev,
       socialMedia: [...prev.socialMedia, { platform: "", url: "" }],
-    }))
-  }
+    }));
+  };
 
   const removeSocialMediaLink = (index) => {
-    const updatedSocialMedia = formData.socialMedia.filter((_, i) => i !== index)
-    setFormData((prev) => ({ ...prev, socialMedia: updatedSocialMedia }))
-  }
+    const updatedSocialMedia = formData.socialMedia.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, socialMedia: updatedSocialMedia }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add form validation here
+    // Add form validation here if needed
 
     const formDataToSend = new FormData();
     Object.keys(formData).forEach((key) => {
       if (key === 'profileImage' && formData[key]) {
         formDataToSend.append(key, formData[key]);
-      } else if (key !== 'profileImage') {
+      } else if (key === 'socialMedia') {
+        formDataToSend.append(key, JSON.stringify(formData[key]));
+      } else {
         formDataToSend.append(key, formData[key]);
       }
     });
 
     try {
-      const response = await axios.put(`https://qrbook.ca/api/cards/update/${initialData.id}`, formDataToSend, {
+      const response = await axios.put(`https://qrbook.ca:5002/api/cards/update/${initialData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -69,7 +71,7 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
       onSave(response.data);
     } catch (error) {
       console.error('Error updating card:', error);
-      // Handle error appropriately
+      setErrors({ submit: 'Failed to update card. Please check your input and try again.' });
     }
   };
 
@@ -117,6 +119,5 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
         </CardFooter>
       </Card>
     </form>
-  )
+  );
 }
-
