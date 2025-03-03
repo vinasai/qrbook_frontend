@@ -58,7 +58,7 @@ export default function AnimatedRegisterForm() {
 
       try {
         const response = await fetch(
-          "https://qrbook.ca:5002/api/users/register",
+          "https://qrbook.ca/api/users/register",
           {
             method: "POST",
             headers: {

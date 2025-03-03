@@ -46,7 +46,7 @@ export default function AddAdmin() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch("https://qrbook.ca:5002/api/users/admin", {
+      const response = await fetch("https://qrbook.ca/api/users/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

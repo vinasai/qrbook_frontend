@@ -159,7 +159,7 @@ export default function CreatorForm() {
     try {
       // Send the request to the backend
       const response = await axios.post(
-        "https://qrbook.ca:5002/api/cards",
+        "https://qrbook.ca/api/cards",
         formDataWithFile,
         {
           headers: {
