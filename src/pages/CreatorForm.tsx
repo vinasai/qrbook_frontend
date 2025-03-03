@@ -35,7 +35,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner"; // Direct import from sonner
 import { validateForm } from "../utils/validation";
 import PersonalInfoForm from "../components/PersonalInfoForm";
 import ContactForm from "../components/ContactForm";
@@ -67,8 +67,6 @@ export default function CreatorForm() {
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const { toast } = useToast();
-
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -103,63 +101,58 @@ export default function CreatorForm() {
     }));
   };
 
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate form data
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       Object.values(validationErrors).forEach((error) => {
-        toast({
-          title: "Validation Error",
+        toast.error("Validation Error", {
           description: error,
-          variant: "destructive",
         });
       });
       return;
     }
-  
+
     // Get userId from cookies
     const userId = Cookies.get("userId");
     if (!userId) {
-      console.error("User ID not found in cookies");
+      toast.error("Authentication Error", {
+        description: "Please login to create a business card",
+      });
       return;
     }
-  
+
     // Create FormData object
     const formDataWithFile = new FormData();
-  
+
     // Append userId
     formDataWithFile.append("userId", userId);
-  
+
     // Append all non-file fields dynamically
     Object.keys(formData).forEach((key) => {
       if (key !== "socialMedia" && key !== "profileImage") {
         formDataWithFile.append(key, formData[key]);
       }
     });
-  
+
     // Append the profile image file (if it exists)
     if (formData.profileImage) {
-      formDataWithFile.append("profileImage", formData.profileImage); // Ensure this matches Multer's field name
+      formDataWithFile.append("profileImage", formData.profileImage);
     }
-  
+
     // Append social media data
     formData.socialMedia.forEach((link, index) => {
       formDataWithFile.append(`socialMedia[${index}][platform]`, link.platform);
       formDataWithFile.append(`socialMedia[${index}][url]`, link.url);
     });
-  
-    // Log the form data for debugging
-    for (let pair of formDataWithFile.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-  
+
     try {
       // Send the request to the backend
       const response = await axios.post(
-        "https://qrbook.ca/api/cards",
+        "https://qrbook.ca:5002/api/cards",
         formDataWithFile,
         {
           headers: {
@@ -168,21 +161,20 @@ export default function CreatorForm() {
           },
         }
       );
-  
+
       // Handle success
       if (response.status === 201) {
         setShowSuccessDialog(true);
       }
     } catch (error) {
       // Handle error
-      console.error(
-        "Error creating card:",
-        error.response?.data || error.message
-      );
-      toast({
-        title: "Error",
-        description: "Failed to create business card. Please try again.",
-        variant: "destructive",
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Failed to create business card. Please try again.";
+      toast.error("Submission Error", {
+        description: errorMessage,
       });
     }
   };
@@ -209,19 +201,19 @@ export default function CreatorForm() {
   ];
 
   return (
-    <div className="min-h-screen  p-8 mt-8">
+    <div className="min-h-screen p-8 mt-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-        <div className="flex items-center justify-between mb-4">
-    <Button 
-      variant="ghost" 
-      onClick={() => navigate(-1)}
-      className="hover:bg-gray-100 dark:hover:bg-gray-800"
-    >
-      <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-      Back
-    </Button>
-  </div>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+              Back
+            </Button>
+          </div>
           <CardTitle className="text-xl font-sans text-center">
             Create Your Digital Business Card
           </CardTitle>
@@ -291,10 +283,8 @@ export default function CreatorForm() {
                 if (Object.keys(currentStepErrors).length > 0) {
                   setErrors(currentStepErrors);
                   Object.values(currentStepErrors).forEach((error) => {
-                    toast({
-                      title: "Validation Error",
+                    toast.error("Validation Error", {
                       description: error,
-                      variant: "destructive",
                     });
                   });
                 } else {
