@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons"
+import { faPhone, faEnvelope, faGlobe } from "@fortawesome/free-solid-svg-icons"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -47,6 +47,26 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
           />
         </div>
         {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+      </div>
+      <div>
+        <Label className="font-sans text-md" htmlFor="website">
+          Website
+        </Label>
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faGlobe}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+          <Input
+            id="website"
+            name="website"
+            type="text"
+            value={formData.website}
+            onChange={handleInputChange}
+            className="pl-10"
+            placeholder="https://example.com"
+          />
+        </div>
       </div>
       <div>
         <Label className="font-sans text-md" htmlFor="description">

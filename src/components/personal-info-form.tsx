@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faUser, faAt, faBriefcase } from "@fortawesome/free-solid-svg-icons"
+import { faUser, faAt, faBriefcase, faLocationDot } from "@fortawesome/free-solid-svg-icons"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -59,6 +59,26 @@ export default function PersonalInfoForm({ formData, handleInputChange, handleFi
           />
         </div>
         {errors.jobPosition && <p className="text-sm text-red-500 mt-1">{errors.jobPosition}</p>}
+      </div>
+      <div>
+        <Label className="font-sans text-md" htmlFor="address">
+          Address
+        </Label>
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faLocationDot}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+          <Input
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            className="pl-10"
+            placeholder="123 Main St, City, Country"
+          />
+        </div>
+        {errors.address && <p className="text-sm text-red-500 mt-1">{errors.address}</p>}
       </div>
       <div>
         <Label className="font-sans text-md" htmlFor="profileImage">

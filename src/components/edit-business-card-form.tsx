@@ -8,6 +8,7 @@ import PersonalInfoForm from "./personal-info-form";
 import ContactForm from "./contact-form";
 import SocialMediaForm from "./social-media-form";
 import axios from "axios";
+import { toast } from "sonner";
 
 interface EditBusinessCardFormProps {
   initialData: any; // Replace 'any' with your Card type
@@ -18,6 +19,7 @@ interface EditBusinessCardFormProps {
 export default function EditBusinessCardForm({ initialData, onClose, onSave }: EditBusinessCardFormProps) {
   const [formData, setFormData] = useState(initialData);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +28,9 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData((prev) => ({ ...prev, profileImage: file }));
+    if (file) {
+      setFormData((prev) => ({ ...prev, profileImage: file }));
+    }
   };
 
   const handleSocialMediaChange = (index, field, value) => {
@@ -49,29 +53,44 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add form validation here if needed
+    setIsSubmitting(true);
 
     const formDataToSend = new FormData();
+
+    // Add all text fields
     Object.keys(formData).forEach((key) => {
-      if (key === 'profileImage' && formData[key]) {
-        formDataToSend.append(key, formData[key]);
-      } else if (key === 'socialMedia') {
-        formDataToSend.append(key, JSON.stringify(formData[key]));
-      } else {
+      if (key !== 'profileImage' && key !== 'socialMedia') {
         formDataToSend.append(key, formData[key]);
       }
     });
 
+    // Handle profile image
+    if (formData.profileImage && formData.profileImage instanceof File) {
+      formDataToSend.append('profileImage', formData.profileImage);
+    }
+
+    // Handle social media
+    formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
+
     try {
-      const response = await axios.put(`https://qrbook.ca:5002/api/cards/update/${initialData.id}`, formDataToSend, {
+      const response = await axios.put(`http://localhost:5000/api/cards/update/${initialData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      toast.success("Business card updated successfully!");
       onSave(response.data);
     } catch (error) {
       console.error('Error updating card:', error);
-      setErrors({ submit: 'Failed to update card. Please check your input and try again.' });
+      toast.error(
+        "Failed to update card",
+        { 
+          description: error.response?.data?.message || "Please check your input and try again."
+        }
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,7 +134,9 @@ export default function EditBusinessCardForm({ initialData, onClose, onSave }: E
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
         </CardFooter>
       </Card>
     </form>

@@ -60,6 +60,8 @@ export default function CreatorForm() {
     jobPosition: "",
     mobileNumber: "",
     email: "",
+    website: "",
+    address: "",
     profileImage: null,
     description: "",
     socialMedia: [],
@@ -152,7 +154,7 @@ export default function CreatorForm() {
     try {
       // Send the request to the backend
       const response = await axios.post(
-        "https://qrbook.ca:5002/api/cards",
+        "http://localhost:5000/api/cards",
         formDataWithFile,
         {
           headers: {
@@ -186,6 +188,8 @@ export default function CreatorForm() {
       jobPosition: "",
       mobileNumber: "",
       email: "",
+      website: "",
+      address: "",
       profileImage: null,
       description: "",
       socialMedia: [],
