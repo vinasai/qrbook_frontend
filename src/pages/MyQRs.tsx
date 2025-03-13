@@ -58,7 +58,7 @@ export default function MyQRs() {
         }
 
         const response = await axios.get(
-          `https://qrbook.ca:5002/api/cards/user/${userId}`,
+          `https://qrbook.ca/api/cards/user/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

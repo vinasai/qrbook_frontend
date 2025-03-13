@@ -48,7 +48,7 @@ export default function PaymentInfo() {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:5000/api/cards?page=${currentPage}&limit=${itemsPerPage}`
+          `https://qrbook.ca/api/cards?page=${currentPage}&limit=${itemsPerPage}`
         );
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
@@ -70,7 +70,7 @@ export default function PaymentInfo() {
     try {
       setIsUpdating(true);
       const updateResponse = await fetch(
-        `http://localhost:5000/api/cards/${selectedCard._id}`,
+        `https://qrbook.ca/api/cards/${selectedCard._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
