@@ -1,8 +1,12 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPhone,
+  faEnvelope,
+  faGlobe,
+  faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function ContactForm({ formData, handleInputChange, errors }) {
   return (
@@ -16,6 +20,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
             icon={faPhone}
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
+
           <Input
             id="mobileNumber"
             name="mobileNumber"
@@ -25,7 +30,9 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
             placeholder="+1234567890"
           />
         </div>
-        {errors.mobileNumber && <p className="text-sm text-red-500 mt-1">{errors.mobileNumber}</p>}
+        {errors.mobileNumber && (
+          <p className="text-sm text-red-500 mt-1">{errors.mobileNumber}</p>
+        )}
       </div>
       <div>
         <Label className="font-sans text-md" htmlFor="email">
@@ -36,6 +43,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
             icon={faEnvelope}
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
+
           <Input
             id="email"
             name="email"
@@ -46,21 +54,59 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
             placeholder="example@example.com"
           />
         </div>
-        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+        {errors.email && (
+          <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+        )}
       </div>
       <div>
-        <Label className="font-sans text-md" htmlFor="description">
-          Description
+        <Label className="font-sans text-md" htmlFor="website">
+          Website
         </Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="A brief description about yourself"
-        />
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faGlobe}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+
+          <Input
+            id="website"
+            name="website"
+            type="url"
+            value={formData.website}
+            onChange={handleInputChange}
+            className="pl-10"
+            placeholder="https://example.com"
+          />
+        </div>
+        {errors.website && (
+          <p className="text-sm text-red-500 mt-1">{errors.website}</p>
+        )}
+      </div>
+      
+      {/* Address field */}
+      <div>
+        <Label className="font-sans text-md" htmlFor="address">
+          Address
+        </Label>
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faLocationDot}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+
+          <Input
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            className="pl-10"
+            placeholder="123 Main St, City, Country"
+          />
+        </div>
+        {errors.address && (
+          <p className="text-sm text-red-500 mt-1">{errors.address}</p>
+        )}
       </div>
     </div>
-  )
+  );
 }
-

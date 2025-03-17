@@ -19,11 +19,7 @@ const ThemeToggle: React.FC = () => {
       whileTap={{ scale: 0.9 }}
     >
       <Icon
-        icon={
-          theme === "light"
-            ? "mdi:weather-night"
-            : "mdi:weather-sunny"
-        }
+        icon={theme === "light" ? "mdi:weather-night" : "mdi:weather-sunny"}
         className="w-6 h-6 text-gray-800 dark:text-gray-200"
       />
     </motion.button>

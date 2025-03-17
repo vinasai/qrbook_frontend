@@ -57,19 +57,16 @@ export default function AnimatedRegisterForm() {
       };
 
       try {
-        const response = await fetch(
-          "https://qrbook.ca/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
+        const response = await fetch("https://qrbook.ca/api/users/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || "Registration failed");
         }
@@ -77,7 +74,9 @@ export default function AnimatedRegisterForm() {
         // Redirect to login page after successful registration
         navigate("/login");
       } catch (error) {
-        setError(error instanceof Error ? error.message : "Registration failed");
+        setError(
+          error instanceof Error ? error.message : "Registration failed",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -94,7 +93,7 @@ export default function AnimatedRegisterForm() {
       >
         <Card className="backdrop-blur-sm bg-black/30 border border-gray-700 shadow-xl">
           <CardHeader className="space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
@@ -104,15 +103,19 @@ export default function AnimatedRegisterForm() {
                 <QrCode className="h-10 w-10 text-white" />
               </div>
             </motion.div>
-            
+
             <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold font-sans text-white">Create Account</CardTitle>
+              <CardTitle className="text-3xl font-bold font-sans text-white">
+                Create Account
+              </CardTitle>
               <CardDescription className="font-sans text-gray-300 text-lg">
-                {step === 1 ? "Step 1: Your information" : "Step 2: Set your password"}
+                {step === 1
+                  ? "Step 1: Your information"
+                  : "Step 2: Set your password"}
               </CardDescription>
             </div>
           </CardHeader>
-          
+
           <CardContent className="px-6 md:px-10">
             <form onSubmit={handleSubmit} className="space-y-8">
               <motion.div
@@ -125,7 +128,12 @@ export default function AnimatedRegisterForm() {
                 {step === 1 && (
                   <>
                     <div className="space-y-2.5">
-                      <Label className="font-sans text-gray-200 text-base" htmlFor="fullName">Full Name</Label>
+                      <Label
+                        className="font-sans text-gray-200 text-base"
+                        htmlFor="fullName"
+                      >
+                        Full Name
+                      </Label>
                       <div className="relative group">
                         <Input
                           id="fullName"
@@ -135,12 +143,18 @@ export default function AnimatedRegisterForm() {
                           onChange={handleChange}
                           required
                         />
+
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2.5">
-                      <Label className="font-sans text-gray-200 text-base" htmlFor="email">Email</Label>
+                      <Label
+                        className="font-sans text-gray-200 text-base"
+                        htmlFor="email"
+                      >
+                        Email
+                      </Label>
                       <div className="relative group">
                         <Input
                           id="email"
@@ -151,6 +165,7 @@ export default function AnimatedRegisterForm() {
                           onChange={handleChange}
                           required
                         />
+
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                       </div>
                     </div>
@@ -160,7 +175,12 @@ export default function AnimatedRegisterForm() {
                 {step === 2 && (
                   <>
                     <div className="space-y-2.5">
-                      <Label className="font-sans text-gray-200 text-base" htmlFor="password">Password</Label>
+                      <Label
+                        className="font-sans text-gray-200 text-base"
+                        htmlFor="password"
+                      >
+                        Password
+                      </Label>
                       <div className="relative group">
                         <Input
                           id="password"
@@ -170,12 +190,18 @@ export default function AnimatedRegisterForm() {
                           onChange={handleChange}
                           required
                         />
+
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2.5">
-                      <Label className="font-sans text-gray-200 text-base" htmlFor="confirmPassword">Confirm Password</Label>
+                      <Label
+                        className="font-sans text-gray-200 text-base"
+                        htmlFor="confirmPassword"
+                      >
+                        Confirm Password
+                      </Label>
                       <div className="relative group">
                         <Input
                           id="confirmPassword"
@@ -185,6 +211,7 @@ export default function AnimatedRegisterForm() {
                           onChange={handleChange}
                           required
                         />
+
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                       </div>
                     </div>
@@ -206,14 +233,15 @@ export default function AnimatedRegisterForm() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                <Button 
-                  className="w-full font-sans text-lg py-7 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500" 
-                  type="submit" 
+                <Button
+                  className="w-full font-sans text-lg py-7 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
+                  type="submit"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+
                       {step === 1 ? "Processing..." : "Creating Account..."}
                     </>
                   ) : (
@@ -232,7 +260,7 @@ export default function AnimatedRegisterForm() {
               </motion.div>
             </form>
           </CardContent>
-          
+
           <CardFooter className="flex justify-center border-t border-gray-800 pt-8 pb-6">
             <motion.p
               initial={{ opacity: 0 }}
@@ -241,9 +269,9 @@ export default function AnimatedRegisterForm() {
               className="text-base font-sans text-gray-400"
             >
               Already have an account?{" "}
-              <Button 
-                onClick={() => navigate("/login")} 
-                variant="link" 
+              <Button
+                onClick={() => navigate("/login")}
+                variant="link"
                 className="text-blue-400 hover:text-blue-300 p-0 font-sans"
               >
                 Sign In

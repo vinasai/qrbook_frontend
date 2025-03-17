@@ -1,12 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const countryCodes = [
   { value: "+1", label: "United States (+1)" },
@@ -84,11 +95,11 @@ const countryCodes = [
   { value: "+376", label: "Andorra (+376)" },
   { value: "+378", label: "San Marino (+378)" },
   { value: "+379", label: "Vatican City (+379)" },
-]
+];
 
 export function CountryCodeSelector({ value, onChange }) {
   const [open, setOpen] = React.useState(false);
-  const selectedCountry = countryCodes.find(code => code.value === value);
+  const selectedCountry = countryCodes.find((code) => code.value === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -106,6 +117,7 @@ export function CountryCodeSelector({ value, onChange }) {
       <PopoverContent className="w-[300px] p-0">
         <Command>
           <CommandInput placeholder="Search country code..." />
+
           <CommandList>
             <CommandEmpty>No country code found.</CommandEmpty>
             <CommandGroup>
@@ -113,11 +125,17 @@ export function CountryCodeSelector({ value, onChange }) {
                 <CommandItem
                   key={code.value}
                   onSelect={() => {
-                    onChange(code.value === value ? "" : code.value)
-                    setOpen(false)
+                    onChange(code.value === value ? "" : code.value);
+                    setOpen(false);
                   }}
                 >
-                  <Check className={cn("mr-2 h-4 w-4", value === code.value ? "opacity-100" : "opacity-0")} />
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === code.value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+
                   {code.label}
                 </CommandItem>
               ))}
@@ -126,6 +144,5 @@ export function CountryCodeSelector({ value, onChange }) {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
-

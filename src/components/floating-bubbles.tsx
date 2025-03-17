@@ -1,10 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { useTheme } from "next-themes"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
-function Bubble({ x, y, size, color }: { x: number; y: number; size: number; color: string }) {
+function Bubble({
+  x,
+  y,
+  size,
+  color,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+}) {
   return (
     <motion.circle
       cx={x}
@@ -24,32 +34,36 @@ function Bubble({ x, y, size, color }: { x: number; y: number; size: number; col
         repeatType: "reverse",
       }}
     />
-  )
+  );
 }
 
 export default function FloatingBubbles() {
-  const [bubbles, setBubbles] = useState<Array<{ id: number; x: number; y: number; size: number; color: string }>>([])
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-  const { theme } = useTheme()
+  const [bubbles, setBubbles] = useState<
+    Array<{ id: number; x: number; y: number; size: number; color: string }>
+  >([]);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const { theme } = useTheme();
 
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions({
         width: window.innerWidth,
         height: window.innerHeight,
-      })
-    }
+      });
+    };
 
-    updateDimensions()
-    window.addEventListener("resize", updateDimensions)
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
 
-    return () => window.removeEventListener("resize", updateDimensions)
-  }, [])
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
 
   useEffect(() => {
-    if (dimensions.width === 0 || dimensions.height === 0) return
+    if (dimensions.width === 0 || dimensions.height === 0) return;
 
-    const bubbleCount = Math.floor((dimensions.width * dimensions.height) / 10000) // Adjust bubble density here
+    const bubbleCount = Math.floor(
+      (dimensions.width * dimensions.height) / 10000,
+    ); // Adjust bubble density here
     const newBubbles = Array.from({ length: bubbleCount }, (_, i) => ({
       id: i,
       x: Math.random() * dimensions.width,
@@ -59,9 +73,9 @@ export default function FloatingBubbles() {
         theme === "dark"
           ? `rgba(${Math.random() * 100 + 155},${Math.random() * 100 + 155},${Math.random() * 255},0.2)`
           : `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`,
-    }))
-    setBubbles(newBubbles)
-  }, [dimensions, theme])
+    }));
+    setBubbles(newBubbles);
+  }, [dimensions, theme]);
 
   return (
     <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 transition-colors duration-500">
@@ -72,6 +86,5 @@ export default function FloatingBubbles() {
         ))}
       </svg>
     </div>
-  )
+  );
 }
-

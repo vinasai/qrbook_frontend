@@ -18,20 +18,102 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "react-hot-toast"; // Changed from sonner to react-hot-toast
+import PersonalInfoForm from '../components/PersonalInfoForm';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+// Define types for our data
+interface SocialMedia {
+  platform: string;
+  url: string;
+}
+
+interface PersonalInfo {
+  name: string;
+  jobPosition: string;
+  email: string;
+  mobileNumber: string;
+  profileImage: string;
+  description?: string;
+  address?: string;
+  websiteTitle?: string;
+  socialMedia?: SocialMedia[];
+}
+
+interface ContactItemProps {
+  icon: string;
+  label: string;
+  value: string;
+  onClick: () => void;
+}
+
+interface AddressItemProps {
+  address: string;
+  onClick: () => void;
+}
+
+interface WebsitePreviewProps {
+  url: string;
+  title: string;
+  onClick: () => void;
+}
+
+interface SocialIconProps {
+  href: string;
+  icon: string;
+  platform: string;
+}
+
+interface ShareButtonProps {
+  icon: string;
+  onClick: () => void;
+  label: string;
+  color: string;
+}
+
+// Add interface for FloatingBubbles props
+interface FloatingBubblesProps {
+  count: number;
+  className?: string;
+}
+
+// Declare the FloatingBubbles component with proper props
+declare module "@/components/floating-bubbles" {
+  const FloatingBubbles: React.FC<FloatingBubblesProps>;
+  export default FloatingBubbles;
+}
+
+// Update the Theme type to match what ThemeProvider expects
+interface ThemeProviderProps {
+  defaultTheme: "light" | "dark" | "system";
+  storageKey: string;
+  children: React.ReactNode;
+}
+
+// Update the ThemeProvider declaration
+declare module "../components/theme-provider" {
+  export const ThemeProvider: React.FC<ThemeProviderProps>;
+  export const useTheme: () => { theme: string | undefined };
+}
 
 const BusinessCardContent = () => {
   const { theme } = useTheme();
   const { id } = useParams();
-  const [personalInfo, setPersonalInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCardData = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://qrbook.ca/api/cards/encoded/${id}`
+          `https://qrbook.ca/api/cards/encoded/${id}`,
         );
         setPersonalInfo(response.data);
         setLoading(false);
@@ -39,7 +121,7 @@ const BusinessCardContent = () => {
         // Fallback to original ID endpoint
         try {
           const fallbackResponse = await axios.get(
-            `https://qrbook.ca/api/cards/${id}`
+            `https://qrbook.ca/api/cards/${id}`,
           );
           setPersonalInfo(fallbackResponse.data);
           setLoading(false);
@@ -55,6 +137,8 @@ const BusinessCardContent = () => {
   }, [id]);
 
   const handleDownloadVCF = async () => {
+    if (!personalInfo) return;
+
     try {
       const loadingToast = toast.loading("Preparing contact card...");
       const imageUrl = `https://qrbook.ca${personalInfo.profileImage}`;
@@ -65,7 +149,12 @@ const BusinessCardContent = () => {
       reader.readAsDataURL(blob);
 
       reader.onloadend = () => {
-        const base64data = reader.result.split(",")[1];
+        if (!reader.result) {
+          toast.error("Failed to process image");
+          return;
+        }
+
+        const base64data = (reader.result as string).split(",")[1];
         const vcfData = `BEGIN:VCARD
 VERSION:3.0
 FN:${personalInfo.name}
@@ -108,12 +197,25 @@ END:VCARD`.replace(/\n/g, "\r\n");
     }
   };
 
-  const handleCopyToClipboard = (text, message) => {
+  const handleCopyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text);
     toast.success(message);
   };
 
-  const socialMediaIcons = {
+  const openInMaps = (address: string) => {
+    if (!address) return;
+    const encodedAddress = encodeURIComponent(address);
+    window.open(`https://maps.google.com/maps?q=${encodedAddress}`, "_blank");
+    toast.success("Opening address in maps");
+  };
+
+  const openWebsite = (url: string) => {
+    if (!url) return;
+    window.open(url, "_blank");
+    toast.success("Opening website");
+  };
+
+  const socialMediaIcons: Record<string, string> = {
     tiktok: "simple-icons:tiktok",
     instagram: "mdi:instagram",
     youtube: "mdi:youtube",
@@ -129,6 +231,65 @@ END:VCARD`.replace(/\n/g, "\r\n");
     pinterest: "mdi:pinterest",
   };
 
+  // Function to check if description has multiple line breaks
+  const hasMultipleLineBreaks = (text?: string): boolean => {
+    if (!text) return false;
+    // Check for HTML line breaks or consecutive newlines
+    return (text.match(/<br\s*\/?>/gi)?.length > 1) || 
+           (text.match(/\n\n/g)?.length > 0);
+  };
+
+  // Render truncated description
+  const renderDescription = (description?: string): React.ReactNode => {
+    if (!description) return null;
+    
+    // If has multiple line breaks, show the "See more" icon
+    if (hasMultipleLineBreaks(description)) {
+      // Get first paragraph or limit description length
+      let firstPart = description;
+      
+      // Try to get first paragraph if there are HTML breaks
+      if (description.includes('<br')) {
+        firstPart = description.split(/<br\s*\/?>/i)[0] + '...';
+      } 
+      // Or if there are newlines
+      else if (description.includes('\n\n')) {
+        firstPart = description.split('\n\n')[0] + '...';
+      }
+      // Or just limit by characters
+      else if (description.length > 150) {
+        firstPart = description.substring(0, 150) + '...';
+      }
+
+      return (
+        <div className="relative">
+          <div dangerouslySetInnerHTML={{ __html: firstPart }} />
+          <div 
+            className="absolute bottom-0 right-0 p-1 cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowFullDescription(true);
+            }}
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="bg-blue-100 dark:bg-blue-900/40 p-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/60 transition-colors">
+                    <Icon icon="mdi:text-box-plus-outline" className="w-5 h-5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">View full description</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+      );
+    }
+
+    // If no multiple line breaks, just show the description
+    return <div dangerouslySetInnerHTML={{ __html: description }} />;
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -139,6 +300,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
           color="rgba(65, 57, 172, 1)"
           secondaryColor="rgba(0, 0, 0, 0.44)"
         />
+
         <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300 animate-pulse">
           Loading contact information...
         </p>
@@ -153,6 +315,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
           icon="solar:danger-triangle-bold"
           className="w-16 h-16 text-red-500 mb-4"
         />
+
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           Something went wrong
         </h2>
@@ -178,6 +341,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
           icon="solar:user-broken"
           className="w-16 h-16 text-amber-500 mb-4"
         />
+
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           Contact Not Found
         </h2>
@@ -188,9 +352,32 @@ END:VCARD`.replace(/\n/g, "\r\n");
     );
   }
 
+  // Fix the website link extraction to handle undefined
+  const websiteLink =
+    personalInfo?.socialMedia?.find(
+      (social) => social.platform.toLowerCase() === "website",
+    )?.url || "";
+
   return (
     <div className="min-h-screen w-full flex flex-col justify-between align-middle overflow-hidden bg-gradient-to-br from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 mt-0 md:-mt-16 lg:-mt-20">
       <FloatingBubbles count={15} className="opacity-30 dark:opacity-16" />
+
+      {/* Description Modal */}
+      <Dialog open={showFullDescription} onOpenChange={setShowFullDescription}>
+        <DialogContent className="max-w-2xl overflow-y-auto max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Icon icon="mdi:information-outline" className="text-blue-600 dark:text-blue-400" />
+              About {personalInfo?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+            {personalInfo?.description && (
+              <div dangerouslySetInnerHTML={{ __html: personalInfo.description }} />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Main Content - Adjusted to fit on one screen */}
       <main className="relative flex-grow flex items-center justify-center py-4 md:py-2 px-4 md:px-6 z-10">
@@ -204,7 +391,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
             {/* Left Section - Profile Details - Reduced sizes for desktop */}
             <div className="w-full md:w-2/5 lg:w-1/3 p-4 md:p-6 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800/90 dark:to-gray-900/90">
               <motion.div
-                className="relative w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl flex-shrink-0"
+                className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-50 lg:h-50 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl flex-shrink-0"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
@@ -221,6 +408,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(personalInfo.name)}&background=0D8ABC&color=fff&size=256`;
                   }}
                 />
+
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 rounded-full" />
               </motion.div>
 
@@ -230,7 +418,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
               >
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-xl md:text-2xl lg:text-2xl font-bold text-gray-900 dark:text-white">
                   {personalInfo.name}
                 </h1>
                 <Badge className="mt-2 text-sm font-medium bg-blue-600/20 dark:bg-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-600/30">
@@ -251,10 +439,11 @@ END:VCARD`.replace(/\n/g, "\r\n");
                   onClick={() =>
                     handleCopyToClipboard(
                       personalInfo.email,
-                      "Email copied to clipboard"
+                      "Email copied to clipboard",
                     )
                   }
                 />
+
                 <ContactItem
                   icon="mdi:phone-outline"
                   label="Phone"
@@ -262,10 +451,19 @@ END:VCARD`.replace(/\n/g, "\r\n");
                   onClick={() =>
                     handleCopyToClipboard(
                       personalInfo.mobileNumber,
-                      "Phone number copied to clipboard"
+                      "Phone number copied to clipboard",
                     )
                   }
                 />
+
+                {/* Add website preview if available */}
+                {websiteLink && (
+                  <WebsitePreview
+                    url={websiteLink}
+                    title={personalInfo.websiteTitle || "My Website"}
+                    onClick={() => openWebsite(websiteLink)}
+                  />
+                )}
               </motion.div>
 
               <motion.div
@@ -285,21 +483,70 @@ END:VCARD`.replace(/\n/g, "\r\n");
             </div>
 
             {/* Right Section - Description and Social Links - Optimized spacing */}
-            <div className="w-full md:w-3/5 lg:w-2/3 p-4 md:p-6 bg-white dark:bg-gray-900">
+            <div className="w-full md:w-3/5 lg:w-2/3 p-4 md:p-6 bg-white dark:bg-gray-900 flex flex-col">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex-grow"
               >
+                {/* Add address if available - Moved to top of right section */}
+                {personalInfo.address && (
+                  <motion.div
+                    className="mb-5 md:mb-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  >
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl overflow-hidden border border-blue-100 dark:border-blue-800/30 shadow-sm">
+                      <div className="flex items-center justify-between p-3 border-b border-blue-100 dark:border-blue-800/30">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Icon
+                              icon="mdi:map-marker"
+                              className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                            />
+                          </div>
+                          <h3 className="text-sm md:text-base font-medium text-gray-900 dark:text-white">
+                            Address
+                          </h3>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-1 h-auto"
+                          onClick={() => openInMaps(personalInfo.address || "")}
+                        >
+                          <Icon
+                            icon="mdi:directions"
+                            className="w-4 h-4 mr-1"
+                          />
+                          Get Directions
+                        </Button>
+                      </div>
+                      <div className="p-3">
+                        <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
+                          {personalInfo.address}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                  <Icon icon="mdi:information-outline" className="mr-2 inline-block" />
+                  <Icon
+                    icon="mdi:information-outline"
+                    className="mr-2 inline-block"
+                  />
                   About
                 </h2>
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-xl shadow-sm">
                   {personalInfo.description ? (
-                    <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">
-                      {personalInfo.description}
-                    </p>
+                    <div 
+                      className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed"
+                    >
+                      {renderDescription(personalInfo.description)}
+                    </div>
                   ) : (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -308,43 +555,51 @@ END:VCARD`.replace(/\n/g, "\r\n");
                       className="flex flex-col items-center py-2 text-center"
                     >
                       <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2">
-                        <Icon 
-                          icon="mdi:text-box-outline" 
-                          className="w-6 h-6 text-blue-600 dark:text-blue-400" 
+                        <Icon
+                          icon="mdi:text-box-outline"
+                          className="w-6 h-6 text-blue-600 dark:text-blue-400"
                         />
                       </div>
                       <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
                         No description available yet.
                       </p>
                       <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-1 italic">
-                        Contact me to learn more about my professional expertise.
+                        Contact me to learn more about my professional
+                        expertise.
                       </p>
                     </motion.div>
                   )}
                 </div>
 
-                <div className="mt-5 md:mt-6">
+                <div className="mt-5 md:mt-6 mb-4">
                   <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Icon icon="mdi:connection" className="mr-2 inline-block" />
                     Connect with me
                   </h2>
-                
-                  {personalInfo.socialMedia && personalInfo.socialMedia.length > 0 ? (
+
+                  {personalInfo.socialMedia &&
+                  personalInfo.socialMedia.length > 0 ? (
                     <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 md:gap-3">
-                      {personalInfo.socialMedia.map((social, index) => (
-                        <SocialIcon
-                          key={index}
-                          href={social.url}
-                          platform={social.platform}
-                          icon={
-                            socialMediaIcons[social.platform.toLowerCase()] ||
-                            "mdi:link-variant"
-                          }
-                        />
-                      ))}
+                      {personalInfo.socialMedia
+                        // Filter out website as it's now displayed separately
+                        .filter(
+                          (social) =>
+                            social.platform.toLowerCase() !== "website",
+                        )
+                        .map((social, index) => (
+                          <SocialIcon
+                            key={index}
+                            href={social.url}
+                            platform={social.platform}
+                            icon={
+                              socialMediaIcons[social.platform.toLowerCase()] ||
+                              "mdi:link-variant"
+                            }
+                          />
+                        ))}
                     </div>
                   ) : (
-                    <motion.div 
+                    <motion.div
                       className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-center"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -352,13 +607,14 @@ END:VCARD`.replace(/\n/g, "\r\n");
                     >
                       <div className="flex flex-col items-center space-y-2">
                         <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <Icon 
-                            icon="mdi:account-network-outline" 
-                            className="w-6 h-6 text-blue-600 dark:text-blue-400" 
+                          <Icon
+                            icon="mdi:account-network-outline"
+                            className="w-6 h-6 text-blue-600 dark:text-blue-400"
                           />
                         </div>
                         <p className="text-gray-600 dark:text-gray-300 text-sm">
-                          No social platforms available yet. Connect through contact details 
+                          No social platforms available yet. Connect through
+                          contact details
                         </p>
                       </div>
                     </motion.div>
@@ -366,8 +622,9 @@ END:VCARD`.replace(/\n/g, "\r\n");
                 </div>
               </motion.div>
 
+              {/* Share My Profile section - Now with mt-auto to push it to the bottom */}
               <motion.div
-                className="mt-5 md:mt-6 pt-4 border-t border-gray-200 dark:border-gray-800"
+                className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
@@ -379,34 +636,43 @@ END:VCARD`.replace(/\n/g, "\r\n");
                       Share My Profile
                     </h3>
                     <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2">
-                      Connect with me on your preferred platform
+                      Share me on your preferred platform
                     </p>
                   </div>
-                  
+
                   <div className="flex gap-3">
-                    <ShareButton 
+                    <ShareButton
                       icon="mdi:email-outline"
                       onClick={() => {
                         const subject = `Contact information for ${personalInfo.name}`;
                         const body = `Here's the contact information for ${personalInfo.name}:\n\n${window.location.href}`;
-                        window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                        window.open(
+                          `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+                        );
                       }}
                       label="Email"
                       color="bg-gray-600"
                     />
-                    <ShareButton 
+
+                    <ShareButton
                       icon="mdi:whatsapp"
                       onClick={() => {
                         const text = `Check out ${personalInfo.name}'s contact information: ${window.location.href}`;
-                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                        window.open(
+                          `https://wa.me/?text=${encodeURIComponent(text)}`,
+                        );
                       }}
                       label="WhatsApp"
                       color="bg-green-600"
                     />
-                    <ShareButton 
+
+                    <ShareButton
                       icon="mdi:content-copy"
                       onClick={() => {
-                        handleCopyToClipboard(window.location.href, "Link copied to clipboard");
+                        handleCopyToClipboard(
+                          window.location.href,
+                          "Link copied to clipboard",
+                        );
                       }}
                       label="Copy"
                       color="bg-blue-600"
@@ -428,7 +694,8 @@ END:VCARD`.replace(/\n/g, "\r\n");
           transition={{ duration: 0.5, delay: 1.2 }}
         >
           <p>
-            © {new Date().getFullYear()} {personalInfo.name}. All rights reserved.
+            © {new Date().getFullYear()} {personalInfo.name}. All rights
+            reserved.
           </p>
           <span className="hidden sm:inline-block">•</span>
           <p>
@@ -448,7 +715,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
   );
 };
 
-function ContactItem({ icon, label, value, onClick }) {
+function ContactItem({ icon, label, value, onClick }: ContactItemProps) {
   return (
     <div
       className="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100 dark:border-gray-700"
@@ -474,9 +741,93 @@ function ContactItem({ icon, label, value, onClick }) {
   );
 }
 
-function SocialIcon({ href, icon, platform }) {
-  const getPlatformColor = (platform) => {
-    const colors = {
+// New component for address with map link
+function AddressItem({ address, onClick }: AddressItemProps) {
+  return (
+    <motion.div
+      className="mt-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border border-blue-100 dark:border-blue-800/30 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+      onClick={onClick}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-gray-700">
+          <Icon
+            icon="mdi:map-marker"
+            className="w-5 h-5 text-blue-600 dark:text-blue-400"
+          />
+        </div>
+        <div className="flex-grow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                Address
+              </p>
+              <p className="text-sm md:text-base font-medium text-gray-900 dark:text-white">
+                {address}
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-1.5 rounded-full shadow-sm group-hover:bg-blue-600 dark:group-hover:bg-blue-600 transition-colors">
+              <Icon
+                icon="mdi:directions"
+                className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            Click to open in maps
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// New component for website with preview
+function WebsitePreview({ url, title, onClick }: WebsitePreviewProps) {
+  // Extract domain for display
+  const domain = url ? new URL(url).hostname.replace("www.", "") : "";
+
+  return (
+    <motion.div
+      className="mt-4 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group bg-white dark:bg-gray-800"
+      onClick={onClick}
+      whileHover={{ y: -3 }}
+    >
+      <div className="flex items-center p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/20 dark:to-blue-900/20 flex items-center justify-center mr-2">
+          <Icon
+            icon="mdi:web"
+            className="w-4 h-4 text-blue-600 dark:text-blue-400"
+          />
+        </div>
+        <div className="flex-grow">
+          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+            {title || domain}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {domain}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-700 p-1.5 rounded-full shadow-sm group-hover:bg-blue-600 transition-colors">
+          <Icon
+            icon="mdi:open-in-new"
+            className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors"
+          />
+        </div>
+      </div>
+      <div className="h-16 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/5 dark:to-indigo-900/5 flex items-center justify-center p-2">
+        <p className="text-xs text-center text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          Click to visit my website
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+function SocialIcon({ href, icon, platform }: SocialIconProps) {
+  const getPlatformColor = (platform: string) => {
+    const colors: Record<string, string> = {
       instagram: "from-pink-500 to-purple-600",
       facebook: "from-blue-600 to-blue-700",
       twitter: "from-blue-400 to-blue-500",
@@ -491,12 +842,35 @@ function SocialIcon({ href, icon, platform }) {
       pinterest: "from-red-500 to-red-700",
       snapchat: "from-yellow-400 to-yellow-500",
     };
-    
+
     return colors[platform.toLowerCase()] || "from-blue-400 to-indigo-500";
   };
-  
+
   const platformColor = getPlatformColor(platform);
   
+  // Get a solid color for the icon based on the platform
+  const getIconColor = (platform: string) => {
+    const colors: Record<string, string> = {
+      instagram: "text-pink-600",
+      facebook: "text-blue-600",
+      twitter: "text-blue-400",
+      linkedin: "text-blue-700",
+      github: "text-gray-800 dark:text-gray-200",
+      youtube: "text-red-600",
+      tiktok: "text-gray-900 dark:text-gray-100",
+      website: "text-indigo-600",
+      whatsapp: "text-green-600",
+      telegram: "text-blue-500",
+      discord: "text-indigo-600",
+      pinterest: "text-red-600",
+      snapchat: "text-yellow-500",
+    };
+
+    return colors[platform.toLowerCase()] || "text-blue-600";
+  };
+
+  const iconColor = getIconColor(platform);
+
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
@@ -505,21 +879,31 @@ function SocialIcon({ href, icon, platform }) {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+            className="group relative overflow-hidden transition-all duration-300 flex items-center justify-center"
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="aspect-square flex items-center justify-center bg-white dark:bg-gray-800 p-2 relative z-10 overflow-hidden border border-gray-100 dark:border-gray-700 rounded-lg w-10 h-10">
+            {/* Fixed square container with consistent width and height */}
+            <div className="w-12 h-12 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden relative">
               <Icon
                 icon={icon}
-                className="w-5 h-5 text-gray-700 dark:text-gray-200 group-hover:text-white transition-colors duration-300 relative z-10"
+                className={`w-5 h-5 ${iconColor} group-hover:text-white transition-colors duration-300 relative z-10`}
               />
-              <div className={`absolute inset-0 opacity-0 bg-gradient-to-br ${platformColor} group-hover:opacity-95 transition-opacity duration-300`}></div>
+
+              {/* Background with default low opacity that increases on hover */}
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${platformColor} opacity-10 group-hover:opacity-95 transition-opacity duration-300`}
+              ></div>
+              
+              {/* Bottom highlight bar that expands on hover */}
+              <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r ${platformColor} transform scale-x-100 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${platformColor} transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
           </motion.a>
         </TooltipTrigger>
-        <TooltipContent className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-md shadow-lg" side="top">
+        <TooltipContent
+          className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-md shadow-lg"
+          side="top"
+        >
           <p className="font-medium">{platform}</p>
         </TooltipContent>
       </Tooltip>
@@ -527,7 +911,7 @@ function SocialIcon({ href, icon, platform }) {
   );
 }
 
-function ShareButton({ icon, onClick, label, color }) {
+function ShareButton({ icon, onClick, label, color }: ShareButtonProps) {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={200}>

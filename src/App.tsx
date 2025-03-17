@@ -30,49 +30,71 @@ function App() {
             <ConditionalNavbar />
             <div className="flex">
               <ConditionalSidebar />
-              <main className="p-4 flex-1 pt-16"> {/* Added pt-16 for navbar spacing */}
+              <main className="p-4 flex-1 pt-16">
+                {" "}
+                {/* Added pt-16 for navbar spacing */}
                 <Routes>
                   <Route path="/" element={<HomePage />} />
+
                   <Route path="/login" element={<Login />} />
+
                   <Route path="/register" element={<Register />} />
-                  
-                  <Route path="/creator-form" element={
-                    <ProtectedRoute>
-                      <CreatorForm />
-                    </ProtectedRoute>
-                  } />
-                  
+
+                  <Route
+                    path="/creator-form"
+                    element={
+                      <ProtectedRoute>
+                        <CreatorForm />
+                      </ProtectedRoute>
+                    }
+                  />
+
                   <Route path="/:id" element={<BusinessCard />} />
-                  
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/myqrs" element={
-                    <ProtectedRoute>
-                      <MyQRs />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/payment-info" element={
-                    <ProtectedRoute requiredRole="admin">
-                      <PaymentInfo />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/add-admin" element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AddAdmin />
-                    </ProtectedRoute>
-                  } />
-                  
-                  <Route path="/manage-admins" element={
-                    <ProtectedRoute requiredRole="admin">
-                      <ManageAdmins />
-                    </ProtectedRoute>
-                  } />
+
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/myqrs"
+                    element={
+                      <ProtectedRoute>
+                        <MyQRs />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/payment-info"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <PaymentInfo />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/add-admin"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AddAdmin />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/manage-admins"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <ManageAdmins />
+                      </ProtectedRoute>
+                    }
+                  />
                 </Routes>
               </main>
             </div>
@@ -85,17 +107,18 @@ function App() {
 
 function ConditionalNavbar() {
   const location = useLocation();
-  
+
   // List of paths where navbar should NOT appear
   const hideNavbarPaths = [
-    '/login',
-    '/register',
+    "/login",
+    "/register",
     // Match single segment paths except profile and myqrs
-    (path: string) => /^\/[^/]+$/.test(path) && !['/profile', '/myqrs'].includes(path)
+    (path: string) =>
+      /^\/[^/]+$/.test(path) && !["/profile", "/myqrs"].includes(path),
   ];
 
-  const shouldHideNavbar = hideNavbarPaths.some(condition => {
-    if (typeof condition === 'function') {
+  const shouldHideNavbar = hideNavbarPaths.some((condition) => {
+    if (typeof condition === "function") {
       return condition(location.pathname);
     }
     return location.pathname === condition;
@@ -110,11 +133,9 @@ function ConditionalNavbar() {
 
 function ConditionalSidebar() {
   const location = useLocation();
-  const showSidebarPaths = ['/payment-info', '/add-admin', '/manage-admins'];
+  const showSidebarPaths = ["/payment-info", "/add-admin", "/manage-admins"];
 
-  return showSidebarPaths.some(path => 
-    location.pathname.startsWith(path)
-  ) ? (
+  return showSidebarPaths.some((path) => location.pathname.startsWith(path)) ? (
     <Sidebar className="left-0 top-0 h-screen w-64 z-40 shadow-lg" />
   ) : null;
 }

@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { CreditCard, UserPlus, Users, LogOut, QrCode, LayoutDashboard } from "lucide-react";
+import {
+  CreditCard,
+  UserPlus,
+  Users,
+  LogOut,
+  QrCode,
+  LayoutDashboard,
+} from "lucide-react";
 import { useAuth } from "./AuthContext"; // Adjust the path as needed
 import type React from "react"; // Added import for React
 
@@ -27,16 +34,21 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="px-4 py-4">
           <div className="flex items-center gap-2 mb-4">
             <QrCode className="h-8 w-8 text-white" />
-            <h2 className="text-2xl font-sans tracking-tight text-white">QRBook</h2>
+            <h2 className="text-2xl font-sans tracking-tight text-white">
+              QRBook
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-white/60" />
+
             <h3 className="text-sm font-sans text-white/60">Admin Dashboard</h3>
           </div>
         </div>
         <div className="px-3">
           <div className="space-y-1">
-            <h2 className="mb-2 px-4 text-xs font-semibold tracking-tight text-white/60">Management</h2>
+            <h2 className="mb-2 px-4 text-xs font-semibold tracking-tight text-white/60">
+              Management
+            </h2>
             <nav className="space-y-2">
               <Button
                 asChild

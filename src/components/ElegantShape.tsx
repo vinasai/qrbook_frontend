@@ -1,6 +1,6 @@
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { useTheme } from "next-themes"
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 export function ElegantShape({
   className,
@@ -10,15 +10,15 @@ export function ElegantShape({
   rotate = 0,
   gradient = "from-white/[0.08]",
 }: {
-  className?: string
-  delay?: number
-  width?: number
-  height?: number
-  rotate?: number
-  gradient?: string
+  className?: string;
+  delay?: number;
+  width?: number;
+  height?: number;
+  rotate?: number;
+  gradient?: string;
 }) {
-  const { resolvedTheme } = useTheme()
-  const isDarkTheme = resolvedTheme === "dark"
+  const { resolvedTheme } = useTheme();
+  const isDarkTheme = resolvedTheme === "dark";
 
   return (
     <motion.div
@@ -62,7 +62,9 @@ export function ElegantShape({
             gradient,
             "backdrop-blur-[2px] border-2",
             isDarkTheme ? "border-white/[0.15]" : "border-black/[0.15]",
-            isDarkTheme ? "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]" : "shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]",
+            isDarkTheme
+              ? "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]"
+              : "shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]",
             "after:absolute after:inset-0 after:rounded-full",
             isDarkTheme
               ? "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]"
@@ -71,6 +73,5 @@ export function ElegantShape({
         />
       </motion.div>
     </motion.div>
-  )
+  );
 }
-

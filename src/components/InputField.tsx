@@ -27,7 +27,7 @@ const InputField = forwardRef(
       placeholder?: string;
       [key: string]: any;
     },
-    ref
+    ref,
   ) => (
     <div className="group relative transition-all duration-300 hover:scale-[1.02]">
       <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
@@ -45,11 +45,12 @@ const InputField = forwardRef(
         ref={ref}
         {...props}
       />
+
       {error && (
         <p className="mt-1 text-sm text-red-600 absolute -bottom-6">{error}</p>
       )}
     </div>
-  )
+  ),
 );
 
 export default InputField;

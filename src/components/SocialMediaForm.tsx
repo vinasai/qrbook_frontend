@@ -21,6 +21,7 @@ export default function SocialMediaForm({
               handleSocialMediaChange(index, "platform", value)
             }
           />
+
           <Input
             type="url"
             value={link.url}
@@ -29,6 +30,7 @@ export default function SocialMediaForm({
             }
             placeholder="https://example.com/username"
           />
+
           <Button
             type="button"
             variant="destructive"
@@ -40,7 +42,6 @@ export default function SocialMediaForm({
         </div>
       ))}
       <Button
-      
         type="button"
         variant="outline"
         onClick={addSocialMediaLink}

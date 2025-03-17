@@ -1,4 +1,4 @@
-import { ElegantShape } from "./ElegantShape"
+import { ElegantShape } from "./ElegantShape";
 
 export function LightAnimatedBackground() {
   return (
@@ -14,6 +14,7 @@ export function LightAnimatedBackground() {
           gradient="from-indigo-500/35"
           className="absolute left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
         />
+
         <ElegantShape
           delay={0.5}
           width={500}
@@ -22,6 +23,7 @@ export function LightAnimatedBackground() {
           gradient="from-rose-500/35"
           className="absolute right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
         />
+
         <ElegantShape
           delay={0.4}
           width={300}
@@ -30,6 +32,7 @@ export function LightAnimatedBackground() {
           gradient="from-violet-500/35"
           className="absolute left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
         />
+
         <ElegantShape
           delay={0.6}
           width={200}
@@ -38,6 +41,7 @@ export function LightAnimatedBackground() {
           gradient="from-amber-500/35"
           className="absolute right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
         />
+
         <ElegantShape
           delay={0.7}
           width={150}
@@ -50,5 +54,5 @@ export function LightAnimatedBackground() {
 
       <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent pointer-events-none" />
     </div>
-  )
+  );
 }

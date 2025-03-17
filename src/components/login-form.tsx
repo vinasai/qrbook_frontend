@@ -42,17 +42,12 @@ export function LoginForm({
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      login(
-        data.token,
-        data.user.fullName,
-        data.user.userId,
-        data.user.type
-      );
+      login(data.token, data.user.fullName, data.user.userId, data.user.type);
 
       navigate(data.user.type === "admin" ? "/payment-info" : "/");
     } catch (error) {
@@ -72,7 +67,7 @@ export function LoginForm({
       >
         <Card className="backdrop-blur-sm bg-black/30 border border-gray-700 shadow-xl">
           <CardHeader className="space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
@@ -82,15 +77,17 @@ export function LoginForm({
                 <QrCode className="h-10 w-10 text-white" />
               </div>
             </motion.div>
-            
+
             <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold font-sans text-white">Welcome Back</CardTitle>
+              <CardTitle className="text-3xl font-bold font-sans text-white">
+                Welcome Back
+              </CardTitle>
               <CardDescription className="font-sans text-gray-300 text-lg">
                 Sign in to access your account
               </CardDescription>
             </div>
           </CardHeader>
-          
+
           <CardContent className="px-6 md:px-10">
             <form
               onSubmit={handleLogin}
@@ -104,7 +101,12 @@ export function LoginForm({
                 className="space-y-5"
               >
                 <div className="space-y-2.5">
-                  <Label className="font-sans text-gray-200 text-base" htmlFor="email">Email</Label>
+                  <Label
+                    className="font-sans text-gray-200 text-base"
+                    htmlFor="email"
+                  >
+                    Email
+                  </Label>
                   <div className="relative group">
                     <Input
                       id="email"
@@ -115,13 +117,19 @@ export function LoginForm({
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
+
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2.5">
                   <div className="flex justify-between items-center">
-                    <Label className="font-sans text-gray-200 text-base" htmlFor="password">Password</Label>
+                    <Label
+                      className="font-sans text-gray-200 text-base"
+                      htmlFor="password"
+                    >
+                      Password
+                    </Label>
                     <a
                       href="#"
                       className="text-sm font-sans text-blue-400 hover:text-blue-300 transition-colors"
@@ -138,7 +146,9 @@ export function LoginForm({
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
+
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -168,9 +178,9 @@ export function LoginForm({
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                <Button 
-                  className="w-full font-sans text-lg py-7 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500" 
-                  type="submit" 
+                <Button
+                  className="w-full font-sans text-lg py-7 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
+                  type="submit"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -185,7 +195,7 @@ export function LoginForm({
               </motion.div>
             </form>
           </CardContent>
-          
+
           <CardFooter className="flex justify-center border-t border-gray-800 pt-8 pb-6">
             <motion.p
               initial={{ opacity: 0 }}
@@ -194,9 +204,9 @@ export function LoginForm({
               className="text-base font-sans text-gray-400"
             >
               Don't have an account?{" "}
-              <Button 
-                onClick={() => navigate("/register")} 
-                variant="link" 
+              <Button
+                onClick={() => navigate("/register")}
+                variant="link"
                 className="text-blue-400 hover:text-blue-300 p-0 font-sans"
               >
                 Create an account

@@ -59,6 +59,7 @@ export default function RegistrationForm({
               autoCorrect="off"
               required
             />
+
             <Button
               type="button"
               variant="ghost"
@@ -88,6 +89,7 @@ export default function RegistrationForm({
               autoCorrect="off"
               required
             />
+
             <Button
               type="button"
               variant="ghost"

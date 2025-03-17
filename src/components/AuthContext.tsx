@@ -8,7 +8,12 @@ interface AuthContextType {
   userId: string | null;
   userType: string | null;
   isLoading: boolean;
-  login: (token: string, fullName: string, userId: string, userType: string) => void;
+  login: (
+    token: string,
+    fullName: string,
+    userId: string,
+    userType: string,
+  ) => void;
   logout: () => void;
 }
 
@@ -55,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const cookieUserType = Cookies.get("userType");
 
       if (!token) {
-        setState(prev => ({ ...prev, isLoading: false }));
+        setState((prev) => ({ ...prev, isLoading: false }));
         return;
       }
 
@@ -77,13 +82,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = (token: string, fullName: string, userId: string, userType: string) => {
-    const cookieOptions = { 
-      secure: import.meta.env.PROD, 
-      sameSite: 'strict' as const,
-      expires: new Date(jwtDecode<JwtPayload>(token).exp * 1000)
+  const login = (
+    token: string,
+    fullName: string,
+    userId: string,
+    userType: string,
+  ) => {
+    const cookieOptions = {
+      secure: import.meta.env.PROD,
+      sameSite: "strict" as const,
+      expires: new Date(jwtDecode<JwtPayload>(token).exp * 1000),
     };
-    
+
     Cookies.set("token", token, cookieOptions);
     Cookies.set("fullName", fullName, cookieOptions);
     Cookies.set("userId", userId, cookieOptions);

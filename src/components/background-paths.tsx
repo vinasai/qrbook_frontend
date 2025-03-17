@@ -1,22 +1,24 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 function FloatingPaths({ position }: { position: number }) {
-  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 0)
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 0,
+  );
 
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth)
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  const isMobile = windowWidth < 768 // Adjust this breakpoint as needed
+  const isMobile = windowWidth < 768; // Adjust this breakpoint as needed
 
-  const pathCount = isMobile ? 18 : 36
-  const baseWidth = isMobile ? 0.3 : 0.5
+  const pathCount = isMobile ? 18 : 36;
+  const baseWidth = isMobile ? 0.3 : 0.5;
 
   const paths = Array.from({ length: pathCount }, (_, i) => ({
     id: i,
@@ -27,7 +29,7 @@ function FloatingPaths({ position }: { position: number }) {
     } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-  }))
+  }));
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -47,7 +49,8 @@ function FloatingPaths({ position }: { position: number }) {
               pathOffset: [0, 1],
             }}
             transition={{
-              duration: (isMobile ? 15 : 20) + Math.random() * (isMobile ? 5 : 10),
+              duration:
+                (isMobile ? 15 : 20) + Math.random() * (isMobile ? 5 : 10),
               repeat: Number.POSITIVE_INFINITY,
               repeatType: "loop",
               ease: "linear",
@@ -56,11 +59,11 @@ function FloatingPaths({ position }: { position: number }) {
         ))}
       </svg>
     </div>
-  )
+  );
 }
 
 export default function BackgroundPaths() {
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   return (
     <div className="absolute inset-0 overflow-hidden">
@@ -71,6 +74,5 @@ export default function BackgroundPaths() {
         <FloatingPaths position={-1} />
       </div>
     </div>
-  )
+  );
 }
-

@@ -60,6 +60,8 @@ export default function CreatorForm() {
     jobPosition: "",
     mobileNumber: "",
     email: "",
+    website: "",
+    address: "",
     profileImage: null,
     description: "",
     socialMedia: [],
@@ -159,7 +161,7 @@ export default function CreatorForm() {
             "Content-Type": "multipart/form-data",
             Link: "QRbook.ca",
           },
-        }
+        },
       );
 
       // Handle success
@@ -186,6 +188,8 @@ export default function CreatorForm() {
       jobPosition: "",
       mobileNumber: "",
       email: "",
+      website: "",
+      address: "",
       profileImage: null,
       description: "",
       socialMedia: [],
@@ -201,7 +205,7 @@ export default function CreatorForm() {
   ];
 
   return (
-    <div className="min-h-screen p-8 mt-8">
+    <div className="min-h-screen pb-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <div className="flex items-center justify-between mb-4">
@@ -234,6 +238,7 @@ export default function CreatorForm() {
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-sans"
                 >
                   <FontAwesomeIcon icon={step.icon} className="mr-2 " />
+
                   {step.title}
                 </TabsTrigger>
               ))}
@@ -289,7 +294,7 @@ export default function CreatorForm() {
                   });
                 } else {
                   setCurrentStep((prev) =>
-                    Math.min(steps.length - 1, prev + 1)
+                    Math.min(steps.length - 1, prev + 1),
                   );
                 }
               }}

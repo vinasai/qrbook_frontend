@@ -1,4 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch"; // Changed from Checkbox to Switch
 
 interface Card {
@@ -15,7 +22,10 @@ interface PaymentTableProps {
   onPaymentConfirmedChange: (cardId: string, currentConfirmed: boolean) => void;
 }
 
-export function PaymentTable({ cards, onPaymentConfirmedChange }: PaymentTableProps) {
+export function PaymentTable({
+  cards,
+  onPaymentConfirmedChange,
+}: PaymentTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -36,11 +46,16 @@ export function PaymentTable({ cards, onPaymentConfirmedChange }: PaymentTablePr
               <div className="flex items-center gap-2">
                 <Switch
                   checked={card.paymentConfirmed}
-                  onCheckedChange={() => 
+                  onCheckedChange={() =>
                     onPaymentConfirmedChange(card._id, card.paymentConfirmed)
                   }
                 />
-                <span className={card.paymentConfirmed ? "text-green-600" : "text-amber-600"}>
+
+                <span
+                  className={
+                    card.paymentConfirmed ? "text-green-600" : "text-amber-600"
+                  }
+                >
                   {card.paymentConfirmed ? "Confirmed" : "Pending"}
                 </span>
               </div>

@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Users } from "lucide-react";
 import {
@@ -28,11 +35,13 @@ export default function ManageAdmins() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://qrbook.ca/api/users/admins?page=${currentPage}&limit=5`
+        `https://qrbook.ca/api/users/admins?page=${currentPage}&limit=5`,
       );
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Error: ${response.status} ${response.statusText} - ${errorText}`);
+        throw new Error(
+          `Error: ${response.status} ${response.statusText} - ${errorText}`,
+        );
       }
       const data = await response.json();
       setAdmins(data.admins);
@@ -49,18 +58,18 @@ export default function ManageAdmins() {
   }, [currentPage]);
 
   const handleEdit = async (userId: string) => {
-    const newEmail = prompt('Enter new email:');
-    const newName = prompt('Enter new name:');
+    const newEmail = prompt("Enter new email:");
+    const newName = prompt("Enter new name:");
     if (!newEmail || !newName) return;
 
     try {
       const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName: newName, email: newEmail })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: newName, email: newEmail }),
       });
 
-      if (!response.ok) throw new Error('Update failed');
+      if (!response.ok) throw new Error("Update failed");
       fetchAdmins(); // Refresh data
     } catch (error) {
       alert(error.message);
@@ -68,17 +77,19 @@ export default function ManageAdmins() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this admin?')) return;
+    if (!confirm("Are you sure you want to delete this admin?")) return;
 
     try {
       const response = await fetch(`https://qrbook.ca/api/users/${userId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
-      if (!response.ok) throw new Error('Deletion failed');
-      
+      if (!response.ok) throw new Error("Deletion failed");
+
       // Reset to first page if last item on current page was deleted
-      setCurrentPage(prev => (admins.length === 1 && prev > 1) ? prev - 1 : prev);
+      setCurrentPage((prev) =>
+        admins.length === 1 && prev > 1 ? prev - 1 : prev,
+      );
       fetchAdmins();
     } catch (error) {
       alert(error.message);
@@ -86,6 +97,7 @@ export default function ManageAdmins() {
   };
 
   if (loading) return <div className="text-white p-8">Loading...</div>;
+
   if (error) return <div className="text-red-500 p-8">Error: {error}</div>;
 
   return (
@@ -100,14 +112,23 @@ export default function ManageAdmins() {
             <TableRow className="border-b border-white/10 hover:bg-transparent">
               <TableHead className="text-white font-sans">Name</TableHead>
               <TableHead className="text-white font-sans">E-Mail</TableHead>
-              <TableHead className="text-right font-sans text-white">Manage</TableHead>
+              <TableHead className="text-right font-sans text-white">
+                Manage
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {admins.map((admin) => (
-              <TableRow key={admin.userId} className="border-b border-white/10 hover:bg-white/5">
-                <TableCell className="text-white font-sans">{admin.fullName}</TableCell>
-                <TableCell className="text-white font-sans">{admin.email}</TableCell>
+              <TableRow
+                key={admin.userId}
+                className="border-b border-white/10 hover:bg-white/5"
+              >
+                <TableCell className="text-white font-sans">
+                  {admin.fullName}
+                </TableCell>
+                <TableCell className="text-white font-sans">
+                  {admin.email}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -132,14 +153,14 @@ export default function ManageAdmins() {
             ))}
           </TableBody>
         </Table>
-        
+
         <div className="mt-6">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
                   className="text-white hover:bg-white/5"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 />
               </PaginationItem>
@@ -157,7 +178,9 @@ export default function ManageAdmins() {
               <PaginationItem>
                 <PaginationNext
                   className="text-white hover:bg-white/5"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   disabled={currentPage === totalPages}
                 />
               </PaginationItem>

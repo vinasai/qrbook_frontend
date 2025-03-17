@@ -2,10 +2,10 @@ import { useAuth } from "@/components/AuthContext";
 import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
-export const ProtectedRoute = ({ 
+export const ProtectedRoute = ({
   children,
-  requiredRole
-}: { 
+  requiredRole,
+}: {
   children: JSX.Element;
   requiredRole?: "user" | "admin";
 }) => {

@@ -23,6 +23,7 @@ export default function AnimatedThemeBackground3D() {
     <div className="absolute inset-0 z-0">
       <Canvas camera={{ position: [0, 0, 15], fov: 60 }}>
         <ambientLight intensity={theme === "dark" ? 0.5 : 1} />
+
         <Particles theme={theme} />
         <Environment preset={theme === "dark" ? "night" : "dawn"} />
       </Canvas>

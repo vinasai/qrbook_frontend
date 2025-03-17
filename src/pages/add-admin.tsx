@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { UserPlus, Loader2 } from "lucide-react"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { UserPlus, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -23,12 +30,12 @@ const formSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters.",
   }),
-})
+});
 
 export default function AddAdmin() {
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,13 +45,13 @@ export default function AddAdmin() {
       email: "",
       password: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setError(null)
-    setSuccess(null)
-    setIsSubmitting(true)
-    
+    setError(null);
+    setSuccess(null);
+    setIsSubmitting(true);
+
     try {
       const response = await fetch("https://qrbook.ca/api/users/admin", {
         method: "POST",
@@ -57,29 +64,31 @@ export default function AddAdmin() {
           mobileNo: values.mobile,
           password: values.password,
         }),
-      })
+      });
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.message || "Failed to create admin")
+        throw new Error(data.message || "Failed to create admin");
       }
 
-      setSuccess("Admin created successfully!")
-      form.reset()
-      setTimeout(() => setSuccess(null), 3000)
+      setSuccess("Admin created successfully!");
+      form.reset();
+      setTimeout(() => setSuccess(null), 3000);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An unknown error occurred")
-      setTimeout(() => setError(null), 5000)
+      setError(
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
+      setTimeout(() => setError(null), 5000);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   function onReset() {
-    form.reset()
-    setError(null)
-    setSuccess(null)
+    form.reset();
+    setError(null);
+    setSuccess(null);
   }
 
   return (
@@ -104,7 +113,10 @@ export default function AddAdmin() {
       {/* Form Card */}
       <div className="rounded-xl border bg-background/95 backdrop-blur-sm shadow-lg max-w-2xl">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="p-6 space-y-6"
+          >
             {error && (
               <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/30">
                 <p className="text-destructive flex items-center gap-2">
@@ -206,8 +218,8 @@ export default function AddAdmin() {
               >
                 Reset
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="px-8 gap-2"
                 disabled={isSubmitting}
               >
@@ -225,5 +237,5 @@ export default function AddAdmin() {
         </Form>
       </div>
     </div>
-  )
+  );
 }

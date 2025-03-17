@@ -1,18 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 interface Payment {
-  id: string
-  status: "Success" | "Processing" | "Failed"
-  email: string
-  amount: number
+  id: string;
+  status: "Success" | "Processing" | "Failed";
+  email: string;
+  amount: number;
 }
 
 const initialPayments: Payment[] = [
@@ -40,43 +52,45 @@ const initialPayments: Payment[] = [
     email: "carmella@hotmail.com",
     amount: 721.0,
   },
-]
+];
 
 export default function PaymentsTable() {
-  const [selectedRows, setSelectedRows] = useState<string[]>([])
-  const [payments, setPayments] = useState<Payment[]>(initialPayments)
-  const [filterText, setFilterText] = useState("")
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [payments, setPayments] = useState<Payment[]>(initialPayments);
+  const [filterText, setFilterText] = useState("");
 
-  const filteredPayments = payments.filter((payment) => payment.email.toLowerCase().includes(filterText.toLowerCase()))
+  const filteredPayments = payments.filter((payment) =>
+    payment.email.toLowerCase().includes(filterText.toLowerCase()),
+  );
 
   const handleSelectAll = () => {
     if (selectedRows.length === payments.length) {
-      setSelectedRows([])
+      setSelectedRows([]);
     } else {
-      setSelectedRows(payments.map((payment) => payment.id))
+      setSelectedRows(payments.map((payment) => payment.id));
     }
-  }
+  };
 
   const handleSelectRow = (id: string) => {
     if (selectedRows.includes(id)) {
-      setSelectedRows(selectedRows.filter((rowId) => rowId !== id))
+      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
     } else {
-      setSelectedRows([...selectedRows, id])
+      setSelectedRows([...selectedRows, id]);
     }
-  }
+  };
 
   const getStatusColor = (status: Payment["status"]) => {
     switch (status) {
       case "Success":
-        return "text-green-500"
+        return "text-green-500";
       case "Processing":
-        return "text-yellow-500"
+        return "text-yellow-500";
       case "Failed":
-        return "text-red-500"
+        return "text-red-500";
       default:
-        return ""
+        return "";
     }
-  }
+  };
 
   return (
     <div className="p-6 space-y-4 bg-background text-foreground max-w-[1200px]">
@@ -92,6 +106,7 @@ export default function PaymentsTable() {
           onChange={(e) => setFilterText(e.target.value)}
           className="max-w-sm"
         />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -111,7 +126,10 @@ export default function PaymentsTable() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-12">
-                <Checkbox checked={selectedRows.length === payments.length} onCheckedChange={handleSelectAll} />
+                <Checkbox
+                  checked={selectedRows.length === payments.length}
+                  onCheckedChange={handleSelectAll}
+                />
               </TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Email</TableHead>
@@ -129,7 +147,9 @@ export default function PaymentsTable() {
                   />
                 </TableCell>
                 <TableCell>
-                  <span className={getStatusColor(payment.status)}>{payment.status}</span>
+                  <span className={getStatusColor(payment.status)}>
+                    {payment.status}
+                  </span>
                 </TableCell>
                 <TableCell>{payment.email}</TableCell>
                 <TableCell>${payment.amount.toFixed(2)}</TableCell>
@@ -138,6 +158,7 @@ export default function PaymentsTable() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
+
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
@@ -167,6 +188,5 @@ export default function PaymentsTable() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

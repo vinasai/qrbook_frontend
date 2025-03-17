@@ -48,7 +48,7 @@ export default function PaymentInfo() {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://qrbook.ca/api/cards?page=${currentPage}&limit=${itemsPerPage}`
+          `https://qrbook.ca/api/cards?page=${currentPage}&limit=${itemsPerPage}`,
         );
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
@@ -66,7 +66,7 @@ export default function PaymentInfo() {
 
   const handlePaymentUpdate = async () => {
     if (!selectedCard) return;
-    
+
     try {
       setIsUpdating(true);
       const updateResponse = await fetch(
@@ -75,7 +75,7 @@ export default function PaymentInfo() {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentConfirmed: newPaymentStatus }),
-        }
+        },
       );
 
       if (!updateResponse.ok) throw new Error("Update failed");
@@ -84,8 +84,8 @@ export default function PaymentInfo() {
         prev.map((card) =>
           card._id === selectedCard._id
             ? { ...card, paymentConfirmed: newPaymentStatus }
-            : card
-        )
+            : card,
+        ),
       );
       setShowConfirmDialog(false);
     } catch (error) {
@@ -181,12 +181,15 @@ export default function PaymentInfo() {
         ) : (
           <>
             <PaymentTable
-  cards={cards}
-  onPaymentConfirmedChange={(cardId, currentConfirmed) => 
-    handleSwitchChange(cards.find(c => c._id === cardId)!, !currentConfirmed)
-  }
-/>
-            
+              cards={cards}
+              onPaymentConfirmedChange={(cardId, currentConfirmed) =>
+                handleSwitchChange(
+                  cards.find((c) => c._id === cardId)!,
+                  !currentConfirmed,
+                )
+              }
+            />
+
             {/* Pagination */}
             <div className="border-t p-4">
               <Pagination>
@@ -195,7 +198,9 @@ export default function PaymentInfo() {
                     <PaginationPrevious
                       asChild
                       variant="ghost"
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
                       disabled={currentPage === 1}
                     >
                       <Button size="sm" className="gap-1">
@@ -212,7 +217,7 @@ export default function PaymentInfo() {
                         onClick={() => setCurrentPage(i + 1)}
                         className={cn(
                           "h-8 w-8 font-medium",
-                          currentPage === i + 1 && "pointer-events-none"
+                          currentPage === i + 1 && "pointer-events-none",
                         )}
                       >
                         {i + 1}
@@ -224,7 +229,9 @@ export default function PaymentInfo() {
                     <PaginationNext
                       asChild
                       variant="ghost"
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
                       disabled={currentPage === totalPages}
                     >
                       <Button size="sm" className="gap-1">

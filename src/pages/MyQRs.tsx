@@ -1,17 +1,24 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { Search, Download, Filter, MoreVertical, Pencil, Plus } from 'lucide-react'
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Card, CardContent } from "../components/ui/card"
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Search,
+  Download,
+  Filter,
+  MoreVertical,
+  Pencil,
+  Plus,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent } from "../components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu"
+} from "../components/ui/dropdown-menu";
 import {
   Pagination,
   PaginationContent,
@@ -19,32 +26,32 @@ import {
   PaginationLink,
   PaginationEllipsis,
   PaginationPrevious,
-  PaginationNext
-} from "../components/ui/pagination"
-import QRCode from "qrcode.react"
-import axios from "axios"
-import Cookies from "js-cookie"
-import EditBusinessCardForm from '../components/edit-business-card-form'
+  PaginationNext,
+} from "../components/ui/pagination";
+import QRCode from "qrcode.react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import EditBusinessCardForm from "../components/edit-business-card-form";
 
 type Card = {
-  id: string
-  name: string
-  businessCardLink: string
-  paymentConfirmed: boolean
-}
+  id: string;
+  name: string;
+  businessCardLink: string;
+  paymentConfirmed: boolean;
+};
 
 export default function MyQRs() {
-  const [cards, setCards] = useState<Card[]>([])
-  const [filteredCards, setFilteredCards] = useState<Card[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filter, setFilter] = useState("all")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingCard, setEditingCard] = useState<Card | null>(null)
-  const cardsPerPage = 8
-  const navigate = useNavigate()
+  const [cards, setCards] = useState<Card[]>([]);
+  const [filteredCards, setFilteredCards] = useState<Card[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCard, setEditingCard] = useState<Card | null>(null);
+  const cardsPerPage = 8;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -63,7 +70,7 @@ export default function MyQRs() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         // If response is empty array, let it fall through to empty state
@@ -72,13 +79,19 @@ export default function MyQRs() {
         setError(""); // Clear any previous errors
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          if (error.response?.status === 404 && error.response?.data?.message === "No cards found for this user") {
+          if (
+            error.response?.status === 404 &&
+            error.response?.data?.message === "No cards found for this user"
+          ) {
             // Handle empty state
             setCards([]);
             setFilteredCards([]);
             setError("");
           } else {
-            setError(error.response?.data?.message || "Failed to fetch cards. Please try again later.");
+            setError(
+              error.response?.data?.message ||
+                "Failed to fetch cards. Please try again later.",
+            );
           }
         } else {
           setError("Failed to fetch cards. Please try again later.");
@@ -92,52 +105,56 @@ export default function MyQRs() {
   }, []);
 
   useEffect(() => {
-    const results = cards.filter((card) => card.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    setFilteredCards(results)
-    setCurrentPage(1)
-  }, [searchTerm, cards])
+    const results = cards.filter((card) =>
+      card.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    setFilteredCards(results);
+    setCurrentPage(1);
+  }, [searchTerm, cards]);
 
   useEffect(() => {
-    let results = cards
+    let results = cards;
     if (filter === "temporary") {
-      results = cards.filter((card) => !card.paymentConfirmed)
+      results = cards.filter((card) => !card.paymentConfirmed);
     } else if (filter === "permanent") {
-      results = cards.filter((card) => card.paymentConfirmed)
+      results = cards.filter((card) => card.paymentConfirmed);
     }
-    setFilteredCards(results)
-    setCurrentPage(1)
-  }, [filter, cards])
+    setFilteredCards(results);
+    setCurrentPage(1);
+  }, [filter, cards]);
 
   const handleDownload = (id: string, name: string) => {
-    const canvas = document.getElementById(`qr-code-${id}`) as HTMLCanvasElement
-    if (!canvas) return
+    const canvas = document.getElementById(
+      `qr-code-${id}`,
+    ) as HTMLCanvasElement;
+    if (!canvas) return;
 
-    const url = canvas.toDataURL("image/png")
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${name.toLowerCase().replace(/\s+/g, "-")}.png`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  }
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name.toLowerCase().replace(/\s+/g, "-")}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const handlePreview = (id: string) => {
-    navigate(`/${id}`)
-  }
+    navigate(`/${id}`);
+  };
 
   const handleEdit = (card: Card) => {
-    setEditingCard(card)
-    setIsEditing(true)
-  }
+    setEditingCard(card);
+    setIsEditing(true);
+  };
 
   const handleCloseEdit = () => {
-    setIsEditing(false)
-    setEditingCard(null)
-  }
+    setIsEditing(false);
+    setEditingCard(null);
+  };
 
-  const indexOfLastCard = currentPage * cardsPerPage
-  const indexOfFirstCard = indexOfLastCard - cardsPerPage
-  const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard)
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard);
 
   return (
     <div className="min-h-screen p-4 sm:p-8 mt-8">
@@ -147,11 +164,14 @@ export default function MyQRs() {
             <h1 className="text-4xl font-sans bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               My QRs
             </h1>
-            <p className="text-muted-foreground">Manage and customize your QR codes</p>
+            <p className="text-muted-foreground">
+              Manage and customize your QR codes
+            </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-500" />
+
               <Input
                 className="pl-10 pr-4 w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary/20"
                 placeholder="Search QR codes..."
@@ -162,29 +182,38 @@ export default function MyQRs() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+                >
                   <Filter className="mr-2 h-4 w-4" />
                   Filter
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setFilter("all")}>All QR Codes</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilter("temporary")}>Temporary Links</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilter("permanent")}>Permanent Links</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilter("all")}>
+                  All QR Codes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilter("temporary")}>
+                  Temporary Links
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilter("permanent")}>
+                  Permanent Links
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             {cards.length > 0 && (
-      <Button
-      asChild
-      className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 py-2.5 font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-    >
-      <Link to="/creator-form" className="flex items-center gap-2">
-        <Plus className="w-4 h-4 shrink-0" />
-        <span className="hidden sm:inline">Create a New QR</span>
-        <span className="sm:hidden">Create a New QR</span>
-      </Link>
-    </Button>
-    )}
+              <Button
+                asChild
+                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 py-2.5 font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <Link to="/creator-form" className="flex items-center gap-2">
+                  <Plus className="w-4 h-4 shrink-0" />
+                  <span className="hidden sm:inline">Create a New QR</span>
+                  <span className="sm:hidden">Create a New QR</span>
+                </Link>
+              </Button>
+            )}
           </div>
         </header>
 
@@ -192,11 +221,15 @@ export default function MyQRs() {
           <div className="flex justify-center items-center h-64">
             <div className="relative">
               <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <div className="mt-4 text-center text-sm text-muted-foreground">Loading your QR codes...</div>
+              <div className="mt-4 text-center text-sm text-muted-foreground">
+                Loading your QR codes...
+              </div>
             </div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-500 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">{error}</div>
+          <div className="text-center text-red-500 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+            {error}
+          </div>
         ) : filteredCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center py-12">
             <div className="max-w-md mx-auto">
@@ -218,7 +251,9 @@ export default function MyQRs() {
                 No QR Codes Found
               </h3>
               <p className="text-muted-foreground mb-8">
-                {searchTerm ? "No results match your search." : "Get started by creating your first QR code."}
+                {searchTerm
+                  ? "No results match your search."
+                  : "Get started by creating your first QR code."}
               </p>
               <Button
                 asChild
@@ -242,13 +277,19 @@ export default function MyQRs() {
                   <CardContent className="p-6 pb-16">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex flex-col gap-1">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate">{card.name}</h3>
-                        <p className="text-xs text-muted-foreground">Created {new Date().toLocaleDateString()}</p>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
+                          {card.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Created {new Date().toLocaleDateString()}
+                        </p>
                       </div>
                       {!card.paymentConfirmed && (
                         <div className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400/20 to-amber-500/20 py-1 px-3">
                           <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                          <span className="text-amber-700 dark:text-amber-400 text-xs font-medium">Temporary</span>
+                          <span className="text-amber-700 dark:text-amber-400 text-xs font-medium">
+                            Temporary
+                          </span>
                         </div>
                       )}
                     </div>
@@ -324,14 +365,18 @@ export default function MyQRs() {
               onClose={handleCloseEdit}
               onSave={(updatedCard) => {
                 // Update the card in state
-                setCards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c))
-                setFilteredCards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c))
-                handleCloseEdit()
+                setCards((prev) =>
+                  prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)),
+                );
+                setFilteredCards((prev) =>
+                  prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)),
+                );
+                handleCloseEdit();
               }}
             />
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

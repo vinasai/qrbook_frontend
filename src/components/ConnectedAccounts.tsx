@@ -1,39 +1,39 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Github, Twitter, Linkedin } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Github, Twitter, Linkedin } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function ConnectedAccounts({ userId }) {
   const [connectedAccounts, setConnectedAccounts] = useState({
     github: false,
     twitter: false,
     linkedin: false,
-  })
+  });
 
   useEffect(() => {
     // Fetch connected accounts
     // This is a mock implementation. Replace with actual API call.
     const fetchConnectedAccounts = async () => {
       // Simulated API call
-      const response = await fetch(`/api/users/${userId}/connected-accounts`)
-      const data = await response.json()
-      setConnectedAccounts(data)
-    }
+      const response = await fetch(`/api/users/${userId}/connected-accounts`);
+      const data = await response.json();
+      setConnectedAccounts(data);
+    };
 
-    fetchConnectedAccounts()
-  }, [userId])
+    fetchConnectedAccounts();
+  }, [userId]);
 
   const handleConnect = (platform) => {
     // Implement connection logic here
-    console.log(`Connecting to ${platform}`)
-  }
+    console.log(`Connecting to ${platform}`);
+  };
 
   const accountItems = [
     { platform: "github", icon: Github, label: "GitHub" },
     { platform: "twitter", icon: Twitter, label: "Twitter" },
     { platform: "linkedin", icon: Linkedin, label: "LinkedIn" },
-  ]
+  ];
 
   return (
     <Card className="mt-6">
@@ -63,6 +63,5 @@ export function ConnectedAccounts({ userId }) {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }
-

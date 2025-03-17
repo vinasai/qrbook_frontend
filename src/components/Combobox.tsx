@@ -1,10 +1,21 @@
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const platforms = [
   { value: "tiktok", label: "TikTok", icon: "faTiktok" },
@@ -14,18 +25,29 @@ const platforms = [
   { value: "whatsapp", label: "WhatsApp", icon: "faWhatsapp" },
   { value: "linkedin", label: "LinkedIn", icon: "faLinkedin" },
   { value: "github", label: "GitHub", icon: "faGithub" },
-]
+];
 
 export function Combobox({ value, onChange }) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between"
+        >
           {value ? (
             <>
-              <FontAwesomeIcon icon={platforms.find((platform) => platform.value === value)?.icon} className="mr-2" />
+              <FontAwesomeIcon
+                icon={
+                  platforms.find((platform) => platform.value === value)?.icon
+                }
+                className="mr-2"
+              />
+
               {platforms.find((platform) => platform.value === value)?.label}
             </>
           ) : (
@@ -45,12 +67,19 @@ export function Combobox({ value, onChange }) {
                   key={platform.value}
                   value={platform.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue)
-                    setOpen(false)
+                    onChange(currentValue === value ? "" : currentValue);
+                    setOpen(false);
                   }}
                 >
-                  <Check className={cn("mr-2 h-4 w-4", value === platform.value ? "opacity-100" : "opacity-0")} />
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === platform.value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+
                   <FontAwesomeIcon icon={platform.icon} className="mr-2" />
+
                   {platform.label}
                 </CommandItem>
               ))}
@@ -59,6 +88,5 @@ export function Combobox({ value, onChange }) {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
-
