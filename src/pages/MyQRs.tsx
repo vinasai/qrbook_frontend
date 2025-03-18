@@ -268,32 +268,41 @@ export default function MyQRs() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
               {currentCards.map((card) => (
                 <Card
                   key={card.id}
-                  className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                  className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg rounded-xl overflow-visible transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 max-w-[280px] w-full mx-auto"
                 >
-                  <CardContent className="p-6 pb-16">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex flex-col gap-1">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
-                          {card.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
+                  <CardContent className="p-4 pb-14">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex flex-col gap-1 flex-1 min-w-0 group/name relative">
+                        <div className="flex items-center gap-2 justify-between">
+                          <div className="relative flex-1 min-w-0 hover:z-[999]">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate hover:text-primary transition-colors">
+                              {card.name}
+                            </h3>
+                            <div className="fixed transform -translate-x-1/2 left-1/2 -translate-y-full opacity-0 hover:opacity-100 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none">
+                              <div className="bg-gray-900/95 dark:bg-gray-700/95 text-white px-4 py-2 rounded-lg text-sm shadow-xl whitespace-normal break-words backdrop-blur-sm max-w-[280px]">
+                                {card.name}
+                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900/95 dark:bg-gray-700/95 transform rotate-45"></div>
+                              </div>
+                            </div>
+                          </div>
+                          {!card.paymentConfirmed && (
+                            <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400/20 to-amber-500/20 py-0.5 px-2 flex-shrink-0">
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                              <span className="text-amber-700 dark:text-amber-400 text-xs font-medium">
+                                Temp
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
                           Created {new Date().toLocaleDateString()}
                         </p>
                       </div>
-                      {!card.paymentConfirmed && (
-                        <div className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400/20 to-amber-500/20 py-1 px-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                          <span className="text-amber-700 dark:text-amber-400 text-xs font-medium">
-                            Temporary
-                          </span>
-                        </div>
-                      )}
                     </div>
-
                     <div className="flex flex-col items-center">
                       <div className="relative p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-inner group-hover:shadow-xl transition-shadow duration-300">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl"></div>

@@ -123,20 +123,12 @@ export function LoginForm({
                 </div>
 
                 <div className="space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <Label
-                      className="font-sans text-gray-200 text-base"
-                      htmlFor="password"
-                    >
-                      Password
-                    </Label>
-                    <a
-                      href="#"
-                      className="text-sm font-sans text-blue-400 hover:text-blue-300 transition-colors"
-                    >
-                      Forgot password?
-                    </a>
-                  </div>
+                  <Label
+                    className="font-sans text-gray-200 text-base"
+                    htmlFor="password"
+                  >
+                    Password
+                  </Label>
                   <div className="relative group">
                     <Input
                       id="password"
@@ -163,6 +155,17 @@ export function LoginForm({
                   </div>
                 </div>
               </motion.div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-blue-400 hover:text-blue-300 p-0"
+                >
+                  Forgot Password?
+                </Button>
+              </div>
 
               {error && (
                 <motion.div

@@ -42,6 +42,8 @@ interface PersonalInfo {
   address?: string;
   websiteTitle?: string;
   socialMedia?: SocialMedia[];
+  paymentConfirmed?: boolean;
+  createdAt: string;
 }
 
 interface ContactItemProps {
@@ -135,6 +137,21 @@ const BusinessCardContent = () => {
 
     fetchCardData();
   }, [id]);
+
+  // Payment status check
+  const isPaymentRequired = () => {
+    if (!personalInfo) return false;
+    
+    // If payment is already confirmed, no need to check further
+    if (personalInfo.paymentConfirmed) return false;
+
+    // Check if 4 days have passed since creation
+    const creationDate = new Date(personalInfo.createdAt);
+    const now = new Date();
+    const daysSinceCreation = Math.floor((now.getTime() - creationDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    return daysSinceCreation >= 4;
+  };
 
   const handleDownloadVCF = async () => {
     if (!personalInfo) return;
@@ -234,9 +251,9 @@ END:VCARD`.replace(/\n/g, "\r\n");
   // Function to check if description has multiple line breaks
   const hasMultipleLineBreaks = (text?: string): boolean => {
     if (!text) return false;
-    // Check for HTML line breaks or consecutive newlines
-    return (text.match(/<br\s*\/?>/gi)?.length > 1) || 
-           (text.match(/\n\n/g)?.length > 0);
+    const brMatches = text.match(/<br\s*\/?>/gi);
+    const newlineMatches = text.match(/\n\n/g);
+    return (brMatches?.length > 1) || (newlineMatches?.length ?? 0) > 0;
   };
 
   // Render truncated description
@@ -348,6 +365,184 @@ END:VCARD`.replace(/\n/g, "\r\n");
         <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
           We couldn't find the contact information you're looking for.
         </p>
+      </div>
+    );
+  }
+
+  // Payment Required Fallback UI
+  if (isPaymentRequired()) {
+    return (
+      <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-950 dark:to-gray-900">
+        <FloatingBubbles count={8} className="opacity-20 dark:opacity-10" />
+        
+        <div className="w-full max-w-xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-3xl"
+          >
+            {/* Card header with pulsing effect */}
+            <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 dark:from-amber-500/5 dark:via-orange-500/5 dark:to-red-500/5 p-8 backdrop-blur-xl border border-amber-200/20 dark:border-amber-500/10 shadow-xl relative overflow-hidden">
+              {/* Animated background effect */}
+              <div className="absolute inset-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-red-500/20 animate-pulse"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.4),transparent)] dark:bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.1),transparent)]"></div>
+              </div>
+
+              <motion.div 
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="mb-6 flex justify-center relative"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-500 to-red-500 blur-2xl opacity-20 animate-pulse"></div>
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center shadow-lg">
+                    <Icon icon="solar:lock-password-bold" className="w-10 h-10 text-white" />
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-center space-y-4 relative"
+              >
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-red-600 dark:from-amber-400 dark:to-red-400 bg-clip-text text-transparent">
+                  Premium Content
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+                  This business card requires payment activation. Unlock full access to {personalInfo.name}'s professional profile and contact details.
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Card body with enhanced steps */}
+            <div className="bg-white dark:bg-gray-900 p-8 border border-gray-100 dark:border-gray-800">
+              <div className="space-y-6">
+                {/* Payment steps with improved visuals */}
+                <div className="space-y-4">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-100 dark:border-amber-900/50 relative overflow-hidden group hover:shadow-md transition-shadow"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/5 transition-all duration-300"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-inner">
+                      <span className="text-amber-700 dark:text-amber-300 text-sm font-bold">1</span>
+                    </div>
+                    <div className="relative">
+                      <h3 className="font-semibold text-amber-900 dark:text-amber-200">Contact Card Owner</h3>
+                      <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                        Get in touch with {personalInfo.name} to activate your access
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-100 dark:border-blue-900/50 relative overflow-hidden group hover:shadow-md transition-shadow"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-300"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-200 to-indigo-200 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-inner">
+                      <span className="text-blue-700 dark:text-blue-300 text-sm font-bold">2</span>
+                    </div>
+                    <div className="relative">
+                      <h3 className="font-semibold text-blue-900 dark:text-blue-200">Complete Payment</h3>
+                      <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                        Follow the secure payment process to unlock premium features
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-100 dark:border-green-900/50 relative overflow-hidden group hover:shadow-md transition-shadow"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:to-emerald-500/5 transition-all duration-300"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-200 to-emerald-200 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-inner">
+                      <span className="text-green-700 dark:text-green-300 text-sm font-bold">3</span>
+                    </div>
+                    <div className="relative">
+                      <h3 className="font-semibold text-green-900 dark:text-green-200">Instant Access</h3>
+                      <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                        Get immediate access to contact details and premium features
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Feature list */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800"
+                >
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Premium Features Include:</h4>
+                  <ul className="space-y-2">
+                    {[
+                      { icon: "mdi:account-details-outline", text: "Full profile access" },
+                      { icon: "mdi:phone-check-outline", text: "Direct contact information" },
+                      { icon: "mdi:share-variant-outline", text: "Social media connections" },
+                      { icon: "mdi:map-marker-outline", text: "Business location details" },
+                    ].map((feature, index) => (
+                      <motion.li
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.8 + index * 0.1 }}
+                        className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                      >
+                        <Icon icon={feature.icon} className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                        {feature.text}
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  
+                  <Button
+                    onClick={() => window.location.href = 'mailto:' + personalInfo.email}
+                    variant="outline"
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white font-medium py-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group relative overflow-hidden"
+                  >
+                    <span className="relative flex items-center justify-center gap-2">
+                      <Icon icon="mdi:email-outline" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Contact Owner
+                    </span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Support text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="text-center mt-6 space-y-2"
+          >
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Need help? Contact support at{" "}
+              <a href="mailto:support@qrbook.ca" className="text-amber-600 dark:text-amber-400 hover:underline">
+                support@qrbook.ca
+              </a>
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              Secure payment processing by Stripe
+            </p>
+          </motion.div>
+        </div>
       </div>
     );
   }
@@ -935,7 +1130,7 @@ function ShareButton({ icon, onClick, label, color }: ShareButtonProps) {
 
 function BusinessCard() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="business-card-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="business-card-theme">
       <BusinessCardContent />
     </ThemeProvider>
   );

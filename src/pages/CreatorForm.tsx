@@ -106,6 +106,32 @@ export default function CreatorForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Format phone number if it exists
+    if (formData.mobileNumber) {
+      // Remove any non-digit characters except +
+      const cleaned = formData.mobileNumber.replace(/[^\d+]/g, '');
+      
+      // Check if it has country code (starts with +)
+      if (!cleaned.startsWith('+')) {
+        toast.error("Invalid Phone Number", {
+          description: "Phone number must include country code (e.g. +1 for US/Canada)",
+        });
+        return;
+      }
+
+      // Format the number as +XX XX-XXX-XXXX
+      const matches = cleaned.match(/^\+(\d{1,4})(\d{2})(\d{3})(\d{4})$/);
+      if (!matches) {
+        toast.error("Invalid Phone Number", {
+          description: "Phone number must be in format: +[country code] XX-XXX-XXXX",
+        });
+        return;
+      }
+
+      // Update the formData with formatted number
+      formData.mobileNumber = `+${matches[1]} ${matches[2]}-${matches[3]}-${matches[4]}`;
+    }
+
     // Validate form data
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {

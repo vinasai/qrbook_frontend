@@ -20,6 +20,7 @@ import PaymentInfo from "./pages/payment-info";
 import AddAdmin from "./pages/add-admin";
 import ManageAdmins from "./pages/manage-admins";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
+import { ForgotPasswordForm } from "./components/forgot-password-form";
 
 function App() {
   return (
@@ -94,6 +95,11 @@ function App() {
                         <ManageAdmins />
                       </ProtectedRoute>
                     }
+                  />
+
+                  <Route
+                    path="/forgot-password"
+                    element={<ForgotPasswordForm />}
                   />
                 </Routes>
               </main>
