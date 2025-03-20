@@ -3,6 +3,8 @@ import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Combobox } from "./Combobox";
+import { CountryCodeSelector } from "./CountryCodeSelector";
+import { useState, useEffect } from "react";
 
 interface Platform {
   value: string;
@@ -81,6 +83,47 @@ const platforms: Platform[] = [
   },
 ];
 
+// Phone number formatting function
+const formatPhoneNumber = (value: string, countryCode: string) => {
+  // Remove all non-digit characters
+  const number = value.replace(/\D/g, "");
+  
+  // Get the country code without the + symbol
+  const code = countryCode.replace('+', '');
+  
+  // Define country-specific formats
+  const formats: Record<string, (num: string) => string> = {
+    '1': (num) => { // US/Canada
+      if (num.length <= 3) return num;
+      if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    },
+    '94': (num) => { // Sri Lanka
+      if (num.length <= 2) return num;
+      if (num.length <= 5) return `${num.slice(0, 2)}-${num.slice(2)}`;
+      return `${num.slice(0, 2)}-${num.slice(2, 5)}-${num.slice(5)}`;
+    },
+    '91': (num) => { // India
+      if (num.length <= 5) return num;
+      return `${num.slice(0, 5)}-${num.slice(5)}`;
+    },
+    '44': (num) => { // UK
+      if (num.length <= 4) return num;
+      if (num.length <= 7) return `${num.slice(0, 4)}-${num.slice(4)}`;
+      return `${num.slice(0, 4)}-${num.slice(4, 7)}-${num.slice(7)}`;
+    },
+  };
+
+  // Use country-specific format or default format
+  const formatter = formats[code] || ((num) => {
+    if (num.length <= 3) return num;
+    if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+    return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+  });
+
+  return formatter(number);
+};
+
 export default function SocialMediaForm({
   formData,
   handleSocialMediaChange,
@@ -88,6 +131,9 @@ export default function SocialMediaForm({
   removeSocialMediaLink,
   errors,
 }: Props) {
+  const [whatsappCountryCodes, setWhatsappCountryCodes] = useState<Record<number, string>>({});
+  const [whatsappLocalNumbers, setWhatsappLocalNumbers] = useState<Record<number, string>>({});
+
   const handleUrlChange = (index: number, value: string, platform: string) => {
     const selectedPlatform = platforms.find(p => p.value === platform);
     if (!selectedPlatform) {
@@ -100,9 +146,14 @@ export default function SocialMediaForm({
       // Remove any @ symbol from the start of the input
       const cleanValue = value.replace(/^@/, '');
       
-      // For WhatsApp, ensure the number is properly formatted
+      // For WhatsApp, handle phone number formatting
       if (platform === 'whatsapp') {
-        const phoneNumber = cleanValue.replace(/\D/g, '');
+        const countryCode = whatsappCountryCodes[index] || '+1';
+        const formattedNumber = formatPhoneNumber(cleanValue, countryCode);
+        setWhatsappLocalNumbers(prev => ({ ...prev, [index]: formattedNumber }));
+        
+        // Remove any non-digit characters for the WhatsApp URL
+        const phoneNumber = formattedNumber.replace(/\D/g, '');
         handleSocialMediaChange(index, "url", `https://wa.me/${phoneNumber}`);
       } else {
         handleSocialMediaChange(index, "url", `${selectedPlatform.baseUrl}${cleanValue}`);
@@ -112,10 +163,23 @@ export default function SocialMediaForm({
     }
   };
 
+  const handleWhatsappCountryCodeChange = (index: number, code: string) => {
+    setWhatsappCountryCodes(prev => ({ ...prev, [index]: code }));
+    const localNumber = whatsappLocalNumbers[index] || '';
+    const formattedNumber = formatPhoneNumber(localNumber, code);
+    setWhatsappLocalNumbers(prev => ({ ...prev, [index]: formattedNumber }));
+    
+    // Update the URL with the new country code
+    const phoneNumber = formattedNumber.replace(/\D/g, '');
+    handleSocialMediaChange(index, "url", `https://wa.me/${phoneNumber}`);
+  };
+
   return (
     <div className="space-y-4">
       {formData.socialMedia.map((link, index) => {
         const selectedPlatform = platforms.find(p => p.value === link.platform);
+        const isWhatsapp = link.platform === 'whatsapp';
+        
         return (
           <div key={index} className="space-y-2">
             <div className="flex space-x-2">
@@ -126,15 +190,33 @@ export default function SocialMediaForm({
                 }
               />
 
-              <Input
-                type="text"
-                value={link.url.replace(selectedPlatform?.baseUrl || '', '')}
-                onChange={(e) =>
-                  handleUrlChange(index, e.target.value, link.platform)
-                }
-                placeholder={selectedPlatform?.placeholder || "Enter URL"}
-                className="flex-1"
-              />
+              {isWhatsapp ? (
+                <div className="flex gap-2 flex-1">
+                  <div className="w-[180px]">
+                    <CountryCodeSelector 
+                      value={whatsappCountryCodes[index] || '+1'} 
+                      onChange={(code) => handleWhatsappCountryCodeChange(index, code)}
+                    />
+                  </div>
+                  <Input
+                    type="text"
+                    value={whatsappLocalNumbers[index] || ''}
+                    onChange={(e) => handleUrlChange(index, e.target.value, link.platform)}
+                    placeholder="Enter phone number"
+                    className="flex-1"
+                  />
+                </div>
+              ) : (
+                <Input
+                  type="text"
+                  value={link.url.replace(selectedPlatform?.baseUrl || '', '')}
+                  onChange={(e) =>
+                    handleUrlChange(index, e.target.value, link.platform)
+                  }
+                  placeholder={selectedPlatform?.placeholder || "Enter URL"}
+                  className="flex-1"
+                />
+              )}
 
               <Button
                 type="button"

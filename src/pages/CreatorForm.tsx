@@ -53,8 +53,29 @@ const platforms = [
   { value: "github", label: "GitHub" },
 ];
 
+interface FormData {
+  name: string;
+  pronouns: string;
+  jobPosition: string;
+  mobileNumber: string;
+  email: string;
+  website: string;
+  address: string;
+  profileImage: File | null;
+  description: string;
+  socialMedia: { platform: string; url: string; }[];
+  [key: string]: string | File | null | { platform: string; url: string; }[];
+}
+
+interface InputChangeEvent {
+  target: {
+    name: string;
+    value: string;
+  };
+}
+
 export default function CreatorForm() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     pronouns: "",
     jobPosition: "",
@@ -71,39 +92,48 @@ export default function CreatorForm() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: InputChangeEvent) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({ ...prev, profileImage: file }));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        profileImage: file
+      }));
+    }
   };
 
-  const handleSocialMediaChange = (index, field, value) => {
-    setFormData((prev) => {
-      const updatedSocialMedia = [...prev.socialMedia];
-      updatedSocialMedia[index][field] = value;
-      return { ...prev, socialMedia: updatedSocialMedia };
-    });
+  const handleSocialMediaChange = (index: number, field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      socialMedia: prev.socialMedia.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
   };
 
   const addSocialMediaLink = () => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      socialMedia: [...prev.socialMedia, { platform: "", url: "" }],
+      socialMedia: [...prev.socialMedia, { platform: '', url: '' }]
     }));
   };
 
-  const removeSocialMediaLink = (index) => {
-    setFormData((prev) => ({
+  const removeSocialMediaLink = (index: number) => {
+    setFormData(prev => ({
       ...prev,
-      socialMedia: prev.socialMedia.filter((_, i) => i !== index),
+      socialMedia: prev.socialMedia.filter((_, i) => i !== index)
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Format phone number if it exists
@@ -119,17 +149,20 @@ export default function CreatorForm() {
         return;
       }
 
-      // Format the number as +XX XX-XXX-XXXX
-      const matches = cleaned.match(/^\+(\d{1,4})(\d{2})(\d{3})(\d{4})$/);
+      // Format the number as +XX XX-XXX-XXXX or +XX XX-XXX-XX
+      const matches = cleaned.match(/^\+(\d{1,4})(\d{2})(\d{3})(\d{2,4})$/);
       if (!matches) {
         toast.error("Invalid Phone Number", {
-          description: "Phone number must be in format: +[country code] XX-XXX-XXXX",
+          description: "Phone number must be 8-10 digits with country code",
         });
         return;
       }
 
       // Update the formData with formatted number
-      formData.mobileNumber = `+${matches[1]} ${matches[2]}-${matches[3]}-${matches[4]}`;
+      setFormData(prev => ({
+        ...prev,
+        mobileNumber: `+${matches[1]} ${matches[2]}-${matches[3]}-${matches[4]}`
+      }));
     }
 
     // Validate form data
@@ -162,46 +195,38 @@ export default function CreatorForm() {
     // Append all non-file fields dynamically
     Object.keys(formData).forEach((key) => {
       if (key !== "socialMedia" && key !== "profileImage") {
-        formDataWithFile.append(key, formData[key]);
+        formDataWithFile.append(key, formData[key] as string);
       }
     });
 
-    // Append the profile image file (if it exists)
+    // Append social media as JSON string
+    formDataWithFile.append("socialMedia", JSON.stringify(formData.socialMedia));
+
+    // Append profile image if exists
     if (formData.profileImage) {
       formDataWithFile.append("profileImage", formData.profileImage);
     }
 
-    // Append social media data
-    formData.socialMedia.forEach((link, index) => {
-      formDataWithFile.append(`socialMedia[${index}][platform]`, link.platform);
-      formDataWithFile.append(`socialMedia[${index}][url]`, link.url);
-    });
-
     try {
-      // Send the request to the backend
-      const response = await axios.post(
-        "https://qrbook.ca/api/cards",
-        formDataWithFile,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Link: "QRbook.ca",
-          },
-        },
-      );
+      const response = await fetch("https://qrbook.ca/api/qr-codes", {
+        method: "POST",
+        body: formDataWithFile,
+      });
 
-      // Handle success
-      if (response.status === 201) {
-        setShowSuccessDialog(true);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create QR code");
       }
+
+      toast.success("Success", {
+        description: "QR code created successfully",
+      });
+
+      navigate("/");
     } catch (error) {
-      // Handle error
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data ||
-        error.message ||
-        "Failed to create business card. Please try again.";
-      toast.error("Submission Error", {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create QR code";
+      toast.error("Error", {
         description: errorMessage,
       });
     }

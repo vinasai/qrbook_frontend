@@ -11,17 +11,70 @@ import { CountryCodeSelector } from "./CountryCodeSelector";
 import { useState, useEffect } from "react";
 
 // Phone number formatting function
-const formatPhoneNumber = (value: string) => {
+const formatPhoneNumber = (value: string, countryCode: string) => {
   // Remove all non-digit characters
   const number = value.replace(/\D/g, "");
   
-  // Format based on length
-  if (number.length <= 3) return number;
-  if (number.length <= 6) return `${number.slice(0, 3)}-${number.slice(3)}`;
-  return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
+  // Get the country code without the + symbol
+  const code = countryCode.replace('+', '');
+  
+  // Define country-specific formats
+  const formats: Record<string, (num: string) => string> = {
+    '1': (num) => { // US/Canada
+      if (num.length <= 3) return num;
+      if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    },
+    '94': (num) => { // Sri Lanka
+      if (num.length <= 2) return num;
+      if (num.length <= 5) return `${num.slice(0, 2)}-${num.slice(2)}`;
+      return `${num.slice(0, 2)}-${num.slice(2, 5)}-${num.slice(5)}`;
+    },
+    '91': (num) => { // India
+      if (num.length <= 5) return num;
+      return `${num.slice(0, 5)}-${num.slice(5)}`;
+    },
+    '44': (num) => { // UK
+      if (num.length <= 4) return num;
+      if (num.length <= 7) return `${num.slice(0, 4)}-${num.slice(4)}`;
+      return `${num.slice(0, 4)}-${num.slice(4, 7)}-${num.slice(7)}`;
+    },
+  };
+
+  // Use country-specific format or default format
+  const formatter = formats[code] || ((num) => {
+    // Handle 9-digit numbers (e.g., 123-456-789)
+    if (num.length === 9) {
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    }
+    // Handle 10-digit numbers (e.g., 123-456-7890)
+    if (num.length === 10) {
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    }
+    // Handle partial numbers
+    if (num.length <= 3) return num;
+    if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+    return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+  });
+
+  return formatter(number);
 };
 
-export default function ContactForm({ formData, handleInputChange, errors }) {
+interface FormData {
+  mobileNumber: string;
+  email: string;
+  website: string;
+  address: string;
+  countryCode?: string;
+}
+
+interface ContactFormProps {
+  formData: FormData;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errors: Record<string, string>;
+}
+
+export default function ContactForm({ formData, handleInputChange, errors }: ContactFormProps) {
   const [countryCode, setCountryCode] = useState(formData.countryCode || "+1");
   const [localNumber, setLocalNumber] = useState("");
 
@@ -35,9 +88,9 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
     }
   }, []);
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/\D/g, ""); // Remove non-digits
-    const formatted = formatPhoneNumber(input);
+    const formatted = formatPhoneNumber(input, countryCode);
     setLocalNumber(formatted);
     
     // Combine country code and local number for the full mobile number
@@ -47,10 +100,10 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         name: "mobileNumber",
         value: fullNumber
       }
-    });
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  const handleCountryCodeChange = (code) => {
+  const handleCountryCodeChange = (code: string) => {
     setCountryCode(code);
     // Update full number when country code changes
     const fullNumber = `${code} ${localNumber}`;
@@ -59,7 +112,7 @@ export default function ContactForm({ formData, handleInputChange, errors }) {
         name: "mobileNumber",
         value: fullNumber
       }
-    });
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   return (

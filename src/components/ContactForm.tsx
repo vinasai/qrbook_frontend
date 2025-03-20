@@ -29,19 +29,75 @@ interface ContactFormProps {
 }
 
 // Phone number formatting function
-const formatPhoneNumber = (value: string) => {
+const formatPhoneNumber = (value: string, countryCode: string) => {
   // Remove all non-digit characters
   const number = value.replace(/\D/g, "");
   
-  // Format based on length
-  if (number.length <= 2) return number;
-  if (number.length <= 5) return `${number.slice(0, 2)}-${number.slice(2)}`;
-  return `${number.slice(0, 2)}-${number.slice(2, 5)}-${number.slice(5, 9)}`;
+  // Get the country code without the + symbol
+  const code = countryCode.replace('+', '');
+  
+  // Define country-specific formats
+  const formats: Record<string, (num: string) => string> = {
+    '1': (num) => { // US/Canada
+      if (num.length <= 3) return num;
+      if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    },
+    '94': (num) => { // Sri Lanka
+      if (num.length <= 2) return num;
+      if (num.length <= 5) return `${num.slice(0, 2)}-${num.slice(2)}`;
+      return `${num.slice(0, 2)}-${num.slice(2, 5)}-${num.slice(5)}`;
+    },
+    '91': (num) => { // India
+      if (num.length <= 5) return num;
+      return `${num.slice(0, 5)}-${num.slice(5)}`;
+    },
+    '44': (num) => { // UK
+      if (num.length <= 4) return num;
+      if (num.length <= 7) return `${num.slice(0, 4)}-${num.slice(4)}`;
+      return `${num.slice(0, 4)}-${num.slice(4, 7)}-${num.slice(7)}`;
+    },
+  };
+
+  // Use country-specific format or default format
+  const formatter = formats[code] || ((num) => {
+    // Handle 8-digit numbers (e.g., 123-456-78)
+    if (num.length === 8) {
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    }
+    // Handle 9-digit numbers (e.g., 123-456-789)
+    if (num.length === 9) {
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    }
+    // Handle 10-digit numbers (e.g., 123-456-7890)
+    if (num.length === 10) {
+      return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+    }
+    // Handle partial numbers
+    if (num.length <= 3) return num;
+    if (num.length <= 6) return `${num.slice(0, 3)}-${num.slice(3)}`;
+    return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`;
+  });
+
+  return formatter(number);
+};
+
+// Get max length based on country code
+const getMaxLength = (countryCode: string): number => {
+  const code = countryCode.replace('+', '');
+  const lengths: Record<string, number> = {
+    '1': 10,  // US/Canada
+    '94': 9,  // Sri Lanka
+    '91': 10, // India
+    '44': 11, // UK
+  };
+  return lengths[code] || 10; // Default to 10 if country not found
 };
 
 export default function ContactForm({ formData, handleInputChange, errors }: ContactFormProps) {
   const [countryCode, setCountryCode] = useState("+1");
   const [localNumber, setLocalNumber] = useState("");
+  const [maxLength, setMaxLength] = useState(15); // Increased max length to be more flexible
 
   useEffect(() => {
     if (formData.mobileNumber) {
@@ -51,7 +107,9 @@ export default function ContactForm({ formData, handleInputChange, errors }: Con
         setLocalNumber(number);
         const codeMatch = formData.mobileNumber.match(/^\+\d+/);
         if (codeMatch) {
-          setCountryCode(codeMatch[0]);
+          const code = codeMatch[0];
+          setCountryCode(code);
+          setMaxLength(getMaxLength(code));
         }
       }
     }
@@ -59,7 +117,7 @@ export default function ContactForm({ formData, handleInputChange, errors }: Con
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/\D/g, "");
-    const formatted = formatPhoneNumber(input);
+    const formatted = formatPhoneNumber(input, countryCode);
     setLocalNumber(formatted);
     
     const fullNumber = `${countryCode} ${formatted}`;
@@ -73,6 +131,7 @@ export default function ContactForm({ formData, handleInputChange, errors }: Con
 
   const handleCountryCodeChange = (code: string) => {
     setCountryCode(code);
+    setMaxLength(getMaxLength(code));
     const fullNumber = `${code} ${localNumber}`;
     handleInputChange({
       target: {
@@ -106,8 +165,8 @@ export default function ContactForm({ formData, handleInputChange, errors }: Con
               value={localNumber}
               onChange={handlePhoneChange}
               className="pl-10"
-              placeholder="12-345-6789"
-              maxLength={12}
+              placeholder="Enter phone number"
+              maxLength={maxLength}
             />
           </div>
         </div>

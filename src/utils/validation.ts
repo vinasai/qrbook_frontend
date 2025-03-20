@@ -70,13 +70,35 @@ export const validateForm = (formData: FormData, currentStep: number = -1): Vali
   }
 
   if (currentStep === 1 || currentStep === -1) {
-    // Mobile number validation for format: +XX XX-XXX-XXXX
+    // Mobile number validation for format: +XX XX-XXX-XXXX or XX-XXX-XXXX
     if (!formData.mobileNumber) {
       errors.mobileNumber = "Mobile number is required";
     } else {
-      const phoneRegex = /^\+\d{1,4}\s\d{2}-\d{3}-\d{4}$/;
-      if (!phoneRegex.test(formData.mobileNumber)) {
-        errors.mobileNumber = "Invalid format. Please use: +[country code] XX-XXX-XXXX";
+      // Remove all non-digit characters for length check
+      const digitsOnly = formData.mobileNumber.replace(/\D/g, "");
+      
+      // Check if the number has country code
+      const hasCountryCode = formData.mobileNumber.startsWith('+');
+      
+      if (hasCountryCode) {
+        // Format with country code: +XX XX-XXX-XXXX
+        const phoneRegex = /^\+\d{1,4}\s\d{2}-\d{3}-\d{4}$/;
+        if (!phoneRegex.test(formData.mobileNumber)) {
+          errors.mobileNumber = "Invalid format. Please use: +[country code] XX-XXX-XXXX";
+        }
+      } else {
+        // Format without country code: XX-XXX-XXXX or XXX-XXX-XXX
+        const phoneRegex = /^\d{2}-\d{3}-\d{4}$|^\d{3}-\d{3}-\d{3}$/;
+        if (!phoneRegex.test(formData.mobileNumber)) {
+          errors.mobileNumber = "Invalid format. Please use: XX-XXX-XXXX or XXX-XXX-XXX";
+        }
+      }
+
+      // Validate length based on whether country code is present
+      if (hasCountryCode && digitsOnly.length !== 10) {
+        errors.mobileNumber = "Phone number must be 10 digits with country code";
+      } else if (!hasCountryCode && digitsOnly.length !== 9 && digitsOnly.length !== 10) {
+        errors.mobileNumber = "Phone number must be 9 or 10 digits without country code";
       }
     }
 

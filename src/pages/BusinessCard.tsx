@@ -44,6 +44,7 @@ interface PersonalInfo {
   socialMedia?: SocialMedia[];
   paymentConfirmed?: boolean;
   createdAt: string;
+  pronouns: string;
 }
 
 interface ContactItemProps {
@@ -260,27 +261,17 @@ END:VCARD`.replace(/\n/g, "\r\n");
   const renderDescription = (description?: string): React.ReactNode => {
     if (!description) return null;
     
-    // If has multiple line breaks, show the "See more" icon
-    if (hasMultipleLineBreaks(description)) {
-      // Get first paragraph or limit description length
-      let firstPart = description;
+    // Count words
+    const wordCount = description.split(/\s+/).length;
+    
+    // If word count is greater than 45, show truncated version
+    if (wordCount > 45) {
+      // Get first 45 words
+      const truncatedText = description.split(/\s+/).slice(0, 45).join(' ') + '...';
       
-      // Try to get first paragraph if there are HTML breaks
-      if (description.includes('<br')) {
-        firstPart = description.split(/<br\s*\/?>/i)[0] + '...';
-      } 
-      // Or if there are newlines
-      else if (description.includes('\n\n')) {
-        firstPart = description.split('\n\n')[0] + '...';
-      }
-      // Or just limit by characters
-      else if (description.length > 150) {
-        firstPart = description.substring(0, 150) + '...';
-      }
-
       return (
-        <div className="relative">
-          <div dangerouslySetInnerHTML={{ __html: firstPart }} />
+        <div className="relative pb-8">
+          <div dangerouslySetInnerHTML={{ __html: truncatedText }} />
           <div 
             className="absolute bottom-0 right-0 p-1 cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
             onClick={(e) => {
@@ -303,7 +294,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
       );
     }
 
-    // If no multiple line breaks, just show the description
+    // If no truncation needed, just show the description
     return <div dangerouslySetInnerHTML={{ __html: description }} />;
   };
 
@@ -548,10 +539,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
   }
 
   // Fix the website link extraction to handle undefined
-  const websiteLink =
-    personalInfo?.socialMedia?.find(
-      (social) => social.platform.toLowerCase() === "website",
-    )?.url || "";
+  const websiteLink = personalInfo?.website || "";
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-between align-middle overflow-hidden bg-gradient-to-br from-white to-blue-50 dark:from-gray-950 dark:to-gray-900 mt-0 md:-mt-16 lg:-mt-20">
@@ -655,7 +643,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
                 {websiteLink && (
                   <WebsitePreview
                     url={websiteLink}
-                    title={personalInfo.websiteTitle || "My Website"}
+                    title={personalInfo.websiteTitle || (personalInfo.pronouns === "They/Them" ? "Our Website" : "My Website")}
                     onClick={() => openWebsite(websiteLink)}
                   />
                 )}
@@ -733,7 +721,7 @@ END:VCARD`.replace(/\n/g, "\r\n");
                     icon="mdi:information-outline"
                     className="mr-2 inline-block"
                   />
-                  About
+                  About ({personalInfo.pronouns})
                 </h2>
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-xl shadow-sm">
                   {personalInfo.description ? (
@@ -769,12 +757,12 @@ END:VCARD`.replace(/\n/g, "\r\n");
                 <div className="mt-5 md:mt-6 mb-4">
                   <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Icon icon="mdi:connection" className="mr-2 inline-block" />
-                    Connect with me
+                    {personalInfo.pronouns === "They/Them" ? "Connect with us" : "Connect with me"}
                   </h2>
 
                   {personalInfo.socialMedia &&
                   personalInfo.socialMedia.length > 0 ? (
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 md:gap-3">
+                    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
                       {personalInfo.socialMedia
                         // Filter out website as it's now displayed separately
                         .filter(
@@ -828,10 +816,10 @@ END:VCARD`.replace(/\n/g, "\r\n");
                   <div className="text-center md:text-left w-full md:w-auto">
                     <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-1 flex items-center justify-center md:justify-start">
                       <Icon icon="mdi:share-variant-outline" className="mr-2" />
-                      Share My Profile
+                      {personalInfo.pronouns === "They/Them" ? "Share Our Profile" : "Share My Profile"}
                     </h3>
                     <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2">
-                      Share me on your preferred platform
+                      {personalInfo.pronouns === "They/Them" ? "Share us on your preferred platform" : "Share me on your preferred platform"}
                     </p>
                   </div>
 
@@ -989,11 +977,11 @@ function WebsitePreview({ url, title, onClick }: WebsitePreviewProps) {
       onClick={onClick}
       whileHover={{ y: -3 }}
     >
-      <div className="flex items-center p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/20 dark:to-blue-900/20 flex items-center justify-center mr-2">
+      <div className="flex items-center p-3 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center mr-3">
           <Icon
             icon="mdi:web"
-            className="w-4 h-4 text-blue-600 dark:text-blue-400"
+            className="w-5 h-5 text-blue-600 dark:text-blue-400"
           />
         </div>
         <div className="flex-grow">
@@ -1004,18 +992,14 @@ function WebsitePreview({ url, title, onClick }: WebsitePreviewProps) {
             {domain}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-700 p-1.5 rounded-full shadow-sm group-hover:bg-blue-600 transition-colors">
+        <div className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-sm group-hover:bg-blue-600 transition-colors">
           <Icon
             icon="mdi:open-in-new"
-            className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors"
+            className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors"
           />
         </div>
       </div>
-      <div className="h-16 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/5 dark:to-indigo-900/5 flex items-center justify-center p-2">
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          Click to visit my website
-        </p>
-      </div>
+      
     </motion.div>
   );
 }
@@ -1075,11 +1059,11 @@ function SocialIcon({ href, icon, platform }: SocialIconProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="group relative overflow-hidden transition-all duration-300 flex items-center justify-center"
-            whileHover={{ scale: 1.05, y: -3 }}
+            whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
             {/* Fixed square container with consistent width and height */}
-            <div className="w-12 h-12 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+            <div className="w-10 h-10 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden relative">
               <Icon
                 icon={icon}
                 className={`w-5 h-5 ${iconColor} group-hover:text-white transition-colors duration-300 relative z-10`}
@@ -1087,11 +1071,8 @@ function SocialIcon({ href, icon, platform }: SocialIconProps) {
 
               {/* Background with default low opacity that increases on hover */}
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${platformColor} opacity-10 group-hover:opacity-95 transition-opacity duration-300`}
+                className={`absolute inset-0 bg-gradient-to-br ${platformColor} opacity-30 group-hover:opacity-100 transition-opacity duration-300`}
               ></div>
-              
-              {/* Bottom highlight bar that expands on hover */}
-              <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r ${platformColor} transform scale-x-100 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
           </motion.a>
         </TooltipTrigger>
